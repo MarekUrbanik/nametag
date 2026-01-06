@@ -6,18 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.3.0](https://github.com/mattogodoy/nametag/compare/v0.2.2...v0.3.0) (2026-01-06)
+## [0.4.0](https://github.com/mattogodoy/nametag/compare/v0.3.0...v0.4.0) (2026-01-06)
 
 ### Features
 
-* Improved setings navigation menu ([5634396](https://github.com/mattogodoy/nametag/commit/5634396024426cfa9037fe8ae2acd05c08b1bbdc))
+* Added an option to delete people too when deleting groups ([0f52a8d](https://github.com/mattogodoy/nametag/commit/0f52a8d9d792ed9c161c30e77d76e7ead831aa1c))
+
+### Bug Fixes
+
+* Don't allow data export when there's no data ([3734633](https://github.com/mattogodoy/nametag/commit/3734633c63346fbecb762b865ddd987196be9352))
+* Fix orphan detection. It broke after implementing soft-delete ([c6e02e6](https://github.com/mattogodoy/nametag/commit/c6e02e67703a7ad58d4840f81ea5f1af58973f43))
+* Minor visual improvements ([5e7f155](https://github.com/mattogodoy/nametag/commit/5e7f1550f3f01aee441ecb75b32d530bf5337d32))
 
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v0.4.0](https://github.com/mattogodoy/nametag/compare/v0.3.0...v0.4.0)
+
+- ✨ Feature: Added an option to delete people too when deleting groups [`0f52a8d`](https://github.com/mattogodoy/nametag/commit/0f52a8d9d792ed9c161c30e77d76e7ead831aa1c)
+- 🐛 Fix: Fix orphan detection. It broke after implementing soft-delete [`c6e02e6`](https://github.com/mattogodoy/nametag/commit/c6e02e67703a7ad58d4840f81ea5f1af58973f43)
+- 🐛 Fix: Don't allow data export when there's no data [`3734633`](https://github.com/mattogodoy/nametag/commit/3734633c63346fbecb762b865ddd987196be9352)
+- 🐛 Fix: Minor visual improvements [`5e7f155`](https://github.com/mattogodoy/nametag/commit/5e7f1550f3f01aee441ecb75b32d530bf5337d32)
+
 #### [v0.3.0](https://github.com/mattogodoy/nametag/compare/v0.2.2...v0.3.0)
 
+> 6 January 2026
+
+- 🔧 Chore: release v0.3.0 [`eea1fc6`](https://github.com/mattogodoy/nametag/commit/eea1fc6d7e331c27a14a196c02b0fcc382c76d01)
 - Improved setings navigation menu [`29b7751`](https://github.com/mattogodoy/nametag/commit/29b77515144b5f48255a5fd1cfcfdbfedd057743)
 - ✨ Feature: Improved setings navigation menu [`5634396`](https://github.com/mattogodoy/nametag/commit/5634396024426cfa9037fe8ae2acd05c08b1bbdc)
 - 🔧 Chore: Merge Github Actions Workflows into one [`7573553`](https://github.com/mattogodoy/nametag/commit/75735535863bf6643b29c89bf2ccf2842a81b6b7)
