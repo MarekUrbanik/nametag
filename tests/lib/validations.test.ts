@@ -349,6 +349,53 @@ describe('validations', () => {
       });
       expect(result.success).toBe(false);
     });
+
+    it('should accept peopleIds as optional array of strings', () => {
+      const result = createGroupSchema.safeParse({
+        name: 'Friends',
+        peopleIds: ['person-1', 'person-2', 'person-3'],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept empty peopleIds array', () => {
+      const result = createGroupSchema.safeParse({
+        name: 'Friends',
+        peopleIds: [],
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept group without peopleIds field', () => {
+      const result = createGroupSchema.safeParse({
+        name: 'Friends',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should reject peopleIds that is not an array', () => {
+      const result = createGroupSchema.safeParse({
+        name: 'Friends',
+        peopleIds: 'not-an-array',
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject peopleIds with non-string elements', () => {
+      const result = createGroupSchema.safeParse({
+        name: 'Friends',
+        peopleIds: [123, 456],
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('should reject peopleIds with mixed types', () => {
+      const result = createGroupSchema.safeParse({
+        name: 'Friends',
+        peopleIds: ['person-1', 123, null],
+      });
+      expect(result.success).toBe(false);
+    });
   });
 
   describe('createRelationshipSchema', () => {

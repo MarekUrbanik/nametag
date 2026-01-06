@@ -253,5 +253,125 @@ describe('Groups API', () => {
         })
       );
     });
+
+    it('should create a group with people when peopleIds provided', async () => {
+      const newGroup = {
+        id: 'group-new',
+        name: 'Family',
+        description: 'Family members',
+        color: '#FF0000',
+        people: [
+          { person: { id: 'person-1', name: 'John' } },
+          { person: { id: 'person-2', name: 'Jane' } },
+        ],
+      };
+
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue(newGroup);
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Family',
+          description: 'Family members',
+          color: '#FF0000',
+          peopleIds: ['person-1', 'person-2'],
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(body.group).toEqual(newGroup);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            people: {
+              create: [
+                { person: { connect: { id: 'person-1' } } },
+                { person: { connect: { id: 'person-2' } } },
+              ],
+            },
+          }),
+          include: expect.objectContaining({
+            people: expect.any(Object),
+          }),
+        })
+      );
+    });
+
+    it('should create a group without people when peopleIds not provided', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test', people: [] });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.not.objectContaining({
+            people: expect.anything(),
+          }),
+        })
+      );
+    });
+
+    it('should create a group without people when peopleIds is empty array', async () => {
+      mocks.groupFindFirst.mockResolvedValue(null);
+      mocks.groupCreate.mockResolvedValue({ id: 'new', name: 'Test', people: [] });
+
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test', peopleIds: [] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.groupCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.not.objectContaining({
+            people: expect.anything(),
+          }),
+        })
+      );
+    });
+
+    it('should reject invalid peopleIds (not an array)', async () => {
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test', peopleIds: 'invalid' }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Validation failed');
+    });
+
+    it('should reject peopleIds with non-string values', async () => {
+      const request = new Request('http://localhost/api/groups', {
+        method: 'POST',
+        body: JSON.stringify({ name: 'Test', peopleIds: [123, 456] }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(400);
+      expect(body.error).toBe('Validation failed');
+    });
   });
 });

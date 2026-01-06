@@ -4,6 +4,15 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import PillSelector from './PillSelector';
+import { formatFullName } from '@/lib/nameUtils';
+
+interface Person {
+  id: string;
+  name: string;
+  surname?: string | null;
+  nickname?: string | null;
+}
 
 interface GroupFormProps {
   group?: {
@@ -13,6 +22,7 @@ interface GroupFormProps {
     color: string | null;
   };
   mode: 'create' | 'edit';
+  availablePeople?: Person[]; // Only used in create mode
 }
 
 const PRESET_COLORS = [
@@ -26,7 +36,7 @@ const PRESET_COLORS = [
   '#14B8A6', // Teal
 ];
 
-export default function GroupForm({ group, mode }: GroupFormProps) {
+export default function GroupForm({ group, mode, availablePeople = [] }: GroupFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,6 +47,9 @@ export default function GroupForm({ group, mode }: GroupFormProps) {
     color: group?.color || PRESET_COLORS[0],
   });
 
+  // State for selected people (only used in create mode)
+  const [selectedPeople, setSelectedPeople] = useState<{ id: string; label: string }[]>([]);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
@@ -46,12 +59,17 @@ export default function GroupForm({ group, mode }: GroupFormProps) {
       const url = mode === 'create' ? '/api/groups' : `/api/groups/${group?.id}`;
       const method = mode === 'create' ? 'POST' : 'PUT';
 
+      // Include peopleIds when creating a group
+      const payload = mode === 'create'
+        ? { ...formData, peopleIds: selectedPeople.map(p => p.id) }
+        : formData;
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -163,6 +181,26 @@ export default function GroupForm({ group, mode }: GroupFormProps) {
           />
         </div>
       </div>
+
+      {/* People selector - only shown when creating a new group */}
+      {mode === 'create' && availablePeople.length > 0 && (
+        <div>
+          <PillSelector
+            label="Add People (Optional)"
+            selectedItems={selectedPeople}
+            availableItems={availablePeople.map(person => ({
+              id: person.id,
+              label: formatFullName(person),
+            }))}
+            onAdd={(item) => setSelectedPeople([...selectedPeople, item])}
+            onRemove={(itemId) => setSelectedPeople(selectedPeople.filter(p => p.id !== itemId))}
+            placeholder="Type a name to add people..."
+            emptyMessage="No people found matching"
+            helpText="You can add people to this group now, or do it later from the group details page."
+            isLoading={isLoading}
+          />
+        </div>
+      )}
 
       <div className="flex justify-end space-x-4 pt-4">
         <Link

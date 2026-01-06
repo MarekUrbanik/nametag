@@ -1,5 +1,6 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { prisma } from '@/lib/prisma';
 import GroupForm from '@/components/GroupForm';
 import Navigation from '@/components/Navigation';
 import LimitReachedMessage from '@/components/LimitReachedMessage';
@@ -16,6 +17,23 @@ export default async function NewGroupPage() {
   // Check if user can create more groups
   const usageCheck = await canCreateResource(session.user.id, 'groups');
   const tierName = TIER_INFO[usageCheck.tier].name;
+
+  // Fetch available people to add to the group
+  const availablePeople = await prisma.person.findMany({
+    where: {
+      userId: session.user.id,
+      deletedAt: null,
+    },
+    select: {
+      id: true,
+      name: true,
+      surname: true,
+      nickname: true,
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -41,7 +59,7 @@ export default async function NewGroupPage() {
             />
           ) : (
             <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-              <GroupForm mode="create" />
+              <GroupForm mode="create" availablePeople={availablePeople} />
             </div>
           )}
         </div>

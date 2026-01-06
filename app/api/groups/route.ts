@@ -48,7 +48,7 @@ export const POST = withAuth(async (request, session) => {
       return validation.response;
     }
 
-    const { name, description, color } = validation.data;
+    const { name, description, color, peopleIds } = validation.data;
 
     // Sanitize user inputs to prevent XSS attacks
     const sanitizedName = sanitizeName(name) || name;
@@ -69,12 +69,30 @@ export const POST = withAuth(async (request, session) => {
       return apiResponse.error('A group with this name already exists');
     }
 
+    // Create the group and optionally add people to it
     const group = await prisma.group.create({
       data: {
         userId: session.user.id,
         name: sanitizedName,
         description: sanitizedDescription,
         color: color || null,
+        // If peopleIds are provided, create PersonGroup associations
+        ...(peopleIds && peopleIds.length > 0 && {
+          people: {
+            create: peopleIds.map((personId) => ({
+              person: {
+                connect: { id: personId },
+              },
+            })),
+          },
+        }),
+      },
+      include: {
+        people: {
+          include: {
+            person: true,
+          },
+        },
       },
     });
 
