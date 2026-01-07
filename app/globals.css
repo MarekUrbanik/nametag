@@ -5,33 +5,33 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Light mode colors - Red/Coral theme */
-  --background: #F5F5F7;
-  --foreground: #2D2D2D;
+  /* Light mode colors - Warm Red/Orange theme */
+  --background: #F8F4EF;
+  --foreground: #131516;
   --surface: #FFFFFF;
   --surface-elevated: #FFFFFF;
-  --border: rgba(231, 75, 60, 0.15);
-  --primary: #E74B3C;
-  --primary-dark: #C43A2C;
-  --secondary: #FF9A8E;
-  --tertiary: #FFCC80;
-  --accent: #E74B3C;
-  --muted: rgba(45, 45, 45, 0.6);
+  --border: rgba(217, 74, 56, 0.15);
+  --primary: #D94A38;
+  --primary-dark: #B93D2E;
+  --secondary: #F2A65A;
+  --tertiary: #F2A65A;
+  --accent: #F2A65A;
+  --muted: rgba(19, 21, 22, 0.6);
 }
 
 .dark {
-  /* Dark mode colors - Red/Coral theme */
-  --background: #1A1A1A;
-  --foreground: #CFCFCF;
-  --surface: #262626;
-  --surface-elevated: #333333;
-  --border: rgba(255, 102, 85, 0.2);
-  --primary: #FF6655;
-  --primary-dark: #E55445;
-  --secondary: #FF9A8E;
-  --tertiary: #FFCC80;
-  --accent: #FF6655;
-  --muted: rgba(207, 207, 207, 0.65);
+  /* Dark mode colors - Warm Red/Orange theme */
+  --background: #1C1A1A;
+  --foreground: #D7D2CB;
+  --surface: #2B2929;
+  --surface-elevated: #353333;
+  --border: rgba(255, 114, 98, 0.2);
+  --primary: #FF7262;
+  --primary-dark: #E55F51;
+  --secondary: #E28B45;
+  --tertiary: #E28B45;
+  --accent: #E28B45;
+  --muted: rgba(215, 210, 203, 0.65);
 }
 
 @theme inline {
