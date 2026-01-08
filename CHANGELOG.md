@@ -6,26 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.6.0](https://github.com/mattogodoy/nametag/compare/v0.5.0...v0.6.0) (2026-01-06)
+## [0.7.0](https://github.com/mattogodoy/nametag/compare/v0.6.0...v0.7.0) (2026-01-08)
 
 ### Features
 
-* Allow filtering graph by multiple groups ([73fe3e0](https://github.com/mattogodoy/nametag/commit/73fe3e00f2e4eeadbf8f6b8e28750ddd8917930d))
-* Allows for adding people during group creation ([ee1be0c](https://github.com/mattogodoy/nametag/commit/ee1be0c8c725487b27dd84577572588c287620db))
+* New design. Dark theme mostly done. Light theme comes next ([f057353](https://github.com/mattogodoy/nametag/commit/f057353896d3672d093a28c28dae272fdef099be))
 
 ### Bug Fixes
 
-* Fix some linting issues ([048f330](https://github.com/mattogodoy/nametag/commit/048f330b4a24f4e232d032386cb064c2cecbcda8))
-* Fixed failing tests ([190818f](https://github.com/mattogodoy/nametag/commit/190818f6f07e91d28a86ed9d4371f321f3a3ad56))
-* Improved navigation by adding creation shortcuts ([c755932](https://github.com/mattogodoy/nametag/commit/c755932f08a256912a469e0b8bee1065ab7f7cfc))
-* Improvements for the pill input component ([bd40a91](https://github.com/mattogodoy/nametag/commit/bd40a919a990185dd6c3324dca50f5d6cf2f9985))
-* Limit GitHub release notes to current version only ([eab6c6f](https://github.com/mattogodoy/nametag/commit/eab6c6f383785ae58b34c3ebd1a26c1fb5baaac3))
+* Fix build ([f45d1b4](https://github.com/mattogodoy/nametag/commit/f45d1b4ffaf6d69510727736e46b01836042d519))
+* Fixed tests after redesign ([0d0f899](https://github.com/mattogodoy/nametag/commit/0d0f89975f3580d4cce25dbdc467e8d358594145))
 
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v0.7.0](https://github.com/mattogodoy/nametag/compare/v0.6.0...v0.7.0)
+
+- Redesign UI color palette [`#2`](https://github.com/mattogodoy/nametag/pull/2)
+- ✨ Feature: New design. Dark theme mostly done. Light theme comes next [`f057353`](https://github.com/mattogodoy/nametag/commit/f057353896d3672d093a28c28dae272fdef099be)
+- Initial changes. Not finished, but enough to see how it looks [`0cd5c5b`](https://github.com/mattogodoy/nametag/commit/0cd5c5b59ffb410052887ef3c82740f3e6e64376)
+- Rebranded from NameTag to Nametag [`a9dc142`](https://github.com/mattogodoy/nametag/commit/a9dc1422651f0552d7059b2d3c3b099ac8df328c)
+- Cool Contrast Blue [`0d7681e`](https://github.com/mattogodoy/nametag/commit/0d7681e1e5b7b0133b2b84c58bd13d5845687866)
+- Playful Modern [`a5e0802`](https://github.com/mattogodoy/nametag/commit/a5e0802b80e557e97c7eeff0efb4bc62f91c8ee0)
+- Testing Modern Minimal Red [`8148210`](https://github.com/mattogodoy/nametag/commit/814821095fdc0021f16d82a8a75fc3b568d4b3e8)
+- Monochrome [`df7ab18`](https://github.com/mattogodoy/nametag/commit/df7ab18cb149d92532aa99d04a84419ddd167dd6)
+- Warm Professional [`4672659`](https://github.com/mattogodoy/nametag/commit/46726590ba160dadd60b05d3bb0718f1b3c2d233)
+- 🐛 Fix: Fixed tests after redesign [`0d0f899`](https://github.com/mattogodoy/nametag/commit/0d0f89975f3580d4cce25dbdc467e8d358594145)
+- 🔧 Chore: Some theme improvements on the network graph [`cd541a2`](https://github.com/mattogodoy/nametag/commit/cd541a281a2c25e10b9d5bf6cbe14758fa7d9f6e)
+- 🔧 Chore: Increased the arrow head a bit [`ce480f0`](https://github.com/mattogodoy/nametag/commit/ce480f0018a56b5dc5812f07c99b437cd30abbe5)
+- 🔧 Chore: Updated .gitignore [`6e0cb84`](https://github.com/mattogodoy/nametag/commit/6e0cb84ae0fcae7f3c8338361c2e649b68106f7a)
+- 🐛 Fix: Fix build [`f45d1b4`](https://github.com/mattogodoy/nametag/commit/f45d1b4ffaf6d69510727736e46b01836042d519)
+
 #### [v0.6.0](https://github.com/mattogodoy/nametag/compare/v0.5.0...v0.6.0)
+
+> 6 January 2026
 
 - ✨ Feature: Allows for adding people during group creation [`ee1be0c`](https://github.com/mattogodoy/nametag/commit/ee1be0c8c725487b27dd84577572588c287620db)
 - ✨ Feature: Allow filtering graph by multiple groups [`73fe3e0`](https://github.com/mattogodoy/nametag/commit/73fe3e00f2e4eeadbf8f6b8e28750ddd8917930d)
@@ -35,6 +50,7 @@ All notable changes to this project will be documented in this file. Dates are d
 - 🔧 Chore: Add visual cues for group creation during person creation [`8c7d603`](https://github.com/mattogodoy/nametag/commit/8c7d6035007822b24318168d402bdd94ed8b244c)
 - 🔧 Chore: Added tooltip with information [`69f16ef`](https://github.com/mattogodoy/nametag/commit/69f16ef5981b63c05619084edc017e1c97ef559d)
 - 🐛 Fix: Improvements for the pill input component [`bd40a91`](https://github.com/mattogodoy/nametag/commit/bd40a919a990185dd6c3324dca50f5d6cf2f9985)
+- 🔧 Chore: release v0.6.0 [`7cabcb1`](https://github.com/mattogodoy/nametag/commit/7cabcb1cb6b8aba4685801e55fad2644468e5d9d)
 - 🐛 Fix: Limit GitHub release notes to current version only [`eab6c6f`](https://github.com/mattogodoy/nametag/commit/eab6c6f383785ae58b34c3ebd1a26c1fb5baaac3)
 - 🐛 Fix: Fixed failing tests [`190818f`](https://github.com/mattogodoy/nametag/commit/190818f6f07e91d28a86ed9d4371f321f3a3ad56)
 - 🐛 Fix: Fix some linting issues [`048f330`](https://github.com/mattogodoy/nametag/commit/048f330b4a24f4e232d032386cb064c2cecbcda8)
