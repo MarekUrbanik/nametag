@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface PasswordStrengthIndicatorProps {
   password: string;
@@ -25,6 +26,8 @@ export function PasswordStrengthIndicator({
   password,
   showRequirements = true,
 }: PasswordStrengthIndicatorProps) {
+  const t = useTranslations('passwordStrength');
+
   const strength = useMemo((): StrengthResult => {
     if (!password) {
       return {
@@ -65,27 +68,27 @@ export function PasswordStrengthIndicator({
       barColor = '';
     } else if (metCount === 5) {
       score = 5;
-      label = 'Very Strong';
+      label = 'veryStrong';
       color = 'text-green-600 dark:text-green-400';
       barColor = 'bg-green-500';
     } else if (metCount === 4) {
       score = 4;
-      label = 'Strong';
+      label = 'strong';
       color = 'text-blue-600 dark:text-blue-400';
       barColor = 'bg-blue-500';
     } else if (metCount === 3) {
       score = 3;
-      label = 'Medium';
+      label = 'medium';
       color = 'text-yellow-600 dark:text-yellow-400';
       barColor = 'bg-yellow-500';
     } else if (metCount === 2) {
       score = 2;
-      label = 'Weak';
+      label = 'weak';
       color = 'text-orange-600 dark:text-orange-400';
       barColor = 'bg-orange-500';
     } else {
       score = 1;
-      label = 'Very Weak';
+      label = 'veryWeak';
       color = 'text-red-600 dark:text-red-400';
       barColor = 'bg-red-500';
     }
@@ -111,7 +114,7 @@ export function PasswordStrengthIndicator({
         </div>
         {strength.label && (
           <span className={`text-sm font-medium ${strength.color} min-w-[90px] text-right`}>
-            {strength.label}
+            {t(strength.label as 'veryWeak' | 'weak' | 'medium' | 'strong' | 'veryStrong')}
           </span>
         )}
       </div>
@@ -121,23 +124,23 @@ export function PasswordStrengthIndicator({
         <div className="space-y-1 text-xs">
           <RequirementItem
             met={strength.requirements.minLength}
-            text="At least 8 characters"
+            text={t('requirements.minLength')}
           />
           <RequirementItem
             met={strength.requirements.hasUppercase}
-            text="One uppercase letter (A-Z)"
+            text={t('requirements.uppercase')}
           />
           <RequirementItem
             met={strength.requirements.hasLowercase}
-            text="One lowercase letter (a-z)"
+            text={t('requirements.lowercase')}
           />
           <RequirementItem
             met={strength.requirements.hasNumber}
-            text="One number (0-9)"
+            text={t('requirements.number')}
           />
           <RequirementItem
             met={strength.requirements.hasSpecialChar}
-            text="One special character (!@#$%^&*)"
+            text={t('requirements.specialChar')}
           />
         </div>
       )}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import PillSelector from './PillSelector';
 import { formatFullName } from '@/lib/nameUtils';
 
@@ -34,6 +35,7 @@ export default function GroupMembersManager({
   currentMembers,
   availablePeople,
 }: GroupMembersManagerProps) {
+  const t = useTranslations('groups.members');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,14 +61,14 @@ export default function GroupMembersManager({
 
       if (!response.ok) {
         const data = await response.json();
-        toast.error(data.error || 'Failed to add member');
+        toast.error(data.error || t('errorAdd'));
         return;
       }
 
-      toast.success(`${item.label} added to ${groupName}`);
+      toast.success(t('addedSuccess', { name: item.label, group: groupName }));
       router.refresh();
     } catch {
-      toast.error('Unable to connect to server');
+      toast.error(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -84,14 +86,14 @@ export default function GroupMembersManager({
 
       if (!response.ok) {
         const data = await response.json();
-        toast.error(data.error || 'Failed to remove member');
+        toast.error(data.error || t('errorRemove'));
         return;
       }
 
-      toast.success(`${formatFullName(member)} removed from ${groupName}`);
+      toast.success(t('removedSuccess', { name: formatFullName(member), group: groupName }));
       router.refresh();
     } catch {
-      toast.error('Unable to connect to server');
+      toast.error(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -99,14 +101,17 @@ export default function GroupMembersManager({
 
   return (
     <PillSelector
-      label={`Members (${currentMembers.length})`}
+      label={t('label', { count: currentMembers.length })}
       selectedItems={selectedItems}
       availableItems={pillItems}
       onAdd={handleAdd}
       onRemove={handleRemove}
-      placeholder="Type a name to add members..."
-      emptyMessage="No people found matching"
-      helpText="Type to search for people and press Enter to add them. Click × to remove members."
+      placeholder={t('placeholder')}
+      emptyMessage={t('emptyMessage')}
+      helpText={t('helpText')}
+      removeAriaLabel={t('remove')}
+      clearAllAriaLabel={t('clearAll')}
+      allSelectedMessage={t('allSelected')}
       isLoading={isLoading}
     />
   );

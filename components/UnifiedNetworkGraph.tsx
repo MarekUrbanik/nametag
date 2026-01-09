@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import PillSelector from './PillSelector';
 
 interface GraphNode extends d3.SimulationNodeDatum {
@@ -63,6 +64,7 @@ export default function UnifiedNetworkGraph({
   enableGroupClustering = true,
   clusterStrength = 0.3,
 }: UnifiedNetworkGraphProps) {
+  const t = useTranslations('dashboard.graph');
   const svgRef = useRef<SVGSVGElement>(null);
   const router = useRouter();
   const previousNodeIdsRef = useRef<Set<string> | null>(null);
@@ -481,7 +483,7 @@ export default function UnifiedNetworkGraph({
       {groups && (
         <div className="mb-4">
           <PillSelector
-            label="Filter by Groups"
+            label={t('filterByGroups')}
             selectedItems={groups
               .filter((g) => selectedGroupIds.includes(g.id))
               .map((g) => ({
@@ -499,8 +501,8 @@ export default function UnifiedNetworkGraph({
               setSelectedGroupIds(selectedGroupIds.filter((id) => id !== itemId))
             }
             onClearAll={() => setSelectedGroupIds([])}
-            placeholder="Type to filter by groups..."
-            emptyMessage="No groups found matching"
+            placeholder={t('filterPlaceholder')}
+            emptyMessage={t('noGroupsFound')}
             showAllOnFocus={true}
             renderPill={(item, onRemove) => (
               <div
@@ -550,8 +552,8 @@ export default function UnifiedNetworkGraph({
                 ? 'bg-primary/30 border-primary/30 shadow-primary/20 dark:bg-primary dark:border-primary dark:shadow-primary/50'
                 : 'bg-surface border-primary/30 shadow-border/20 hover:bg-surface-elevated dark:bg-surface dark:border-border dark:hover:bg-surface-elevated'
             }`}
-            aria-label="Cluster by group"
-            title="Cluster by group"
+            aria-label={t('clusterByGroup')}
+            title={t('clusterByGroup')}
           >
             <svg
               className="w-5 h-5 text-primary drop-shadow-lg dark:text-white"
@@ -570,8 +572,8 @@ export default function UnifiedNetworkGraph({
           <button
             onClick={recenterGraph}
             className="p-3 bg-surface border-2 border-primary/30 shadow-lg shadow-border/20 rounded-lg hover:scale-105 active:scale-95 transition-all dark:bg-surface dark:border-border dark:hover:bg-surface-elevated dark:hover:border-secondary/50"
-            aria-label="Re-center graph"
-            title="Re-center graph"
+            aria-label={t('recenterGraph')}
+            title={t('recenterGraph')}
           >
             <svg
               className="w-5 h-5 text-primary drop-shadow-lg dark:text-white"

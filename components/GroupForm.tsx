@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import PillSelector from './PillSelector';
 import { formatFullName } from '@/lib/nameUtils';
 import { Button } from './ui/Button';
@@ -37,6 +38,7 @@ const PRESET_COLORS = [
 ];
 
 export default function GroupForm({ group, mode, availablePeople = [] }: GroupFormProps) {
+  const t = useTranslations('groups.form');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -75,15 +77,15 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Something went wrong');
+        setError(data.error || t('errorSomethingWrong'));
         return;
       }
 
       // Show success toast
       toast.success(
         mode === 'create'
-          ? `Group "${formData.name}" has been created`
-          : `Group "${formData.name}" has been updated`
+          ? t('successCreated', { name: formData.name })
+          : t('successUpdated', { name: formData.name })
       );
 
       // Redirect to detail page after edit, list page after create
@@ -94,7 +96,7 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
       }
       router.refresh();
     } catch {
-      setError('Unable to connect to server. Please check your connection and try again.');
+      setError(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -113,7 +115,7 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
           htmlFor="name"
           className="block text-sm font-medium text-muted mb-1"
         >
-          Group Name *
+          {t('groupNameRequired')}
         </label>
         <input
           type="text"
@@ -122,7 +124,7 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="e.g., Family, Friends, Colleagues"
+          placeholder={t('groupNamePlaceholder')}
         />
       </div>
 
@@ -131,7 +133,7 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
           htmlFor="description"
           className="block text-sm font-medium text-muted mb-1"
         >
-          Description
+          {t('description')}
         </label>
         <textarea
           id="description"
@@ -141,13 +143,13 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
             setFormData({ ...formData, description: e.target.value })
           }
           className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="Optional description for this group"
+          placeholder={t('descriptionPlaceholder')}
         />
       </div>
 
       <div>
         <label className="block text-sm font-medium text-muted mb-2">
-          Color
+          {t('color')}
         </label>
         <div className="flex flex-wrap gap-3">
           {PRESET_COLORS.map((color) => (
@@ -170,7 +172,7 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
             htmlFor="customColor"
             className="block text-xs text-muted mb-1"
           >
-            Or choose a custom color:
+            {t('customColor')}
           </label>
           <input
             type="color"
@@ -186,7 +188,7 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
       {mode === 'create' && availablePeople.length > 0 && (
         <div>
           <PillSelector
-            label="Add People (Optional)"
+            label={t('addPeople')}
             selectedItems={selectedPeople}
             availableItems={availablePeople.map(person => ({
               id: person.id,
@@ -194,9 +196,9 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
             }))}
             onAdd={(item) => setSelectedPeople([...selectedPeople, item])}
             onRemove={(itemId) => setSelectedPeople(selectedPeople.filter(p => p.id !== itemId))}
-            placeholder="Type a name to add people..."
-            emptyMessage="No people found matching"
-            helpText="You can add people to this group now, or do it later from the group details page."
+            placeholder={t('addPeoplePlaceholder')}
+            emptyMessage={t('noPeopleFound')}
+            helpText={t('addPeopleHelp')}
             isLoading={isLoading}
           />
         </div>
@@ -204,14 +206,14 @@ export default function GroupForm({ group, mode, availablePeople = [] }: GroupFo
 
       <div className="flex justify-end space-x-4 pt-4">
         <Button variant="secondary" href="/groups">
-          Cancel
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={isLoading}>
           {isLoading
-            ? 'Saving...'
+            ? t('saving')
             : mode === 'create'
-            ? 'Create Group'
-            : 'Update Group'}
+            ? t('createGroup')
+            : t('updateGroup')}
         </Button>
       </div>
     </form>

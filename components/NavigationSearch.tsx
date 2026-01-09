@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { formatFullName } from '@/lib/nameUtils';
 
 interface Person {
@@ -13,6 +14,7 @@ interface Person {
 
 export default function NavigationSearch() {
   const router = useRouter();
+  const t = useTranslations('nav.search');
   const [results, setResults] = useState<Person[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
@@ -143,7 +145,7 @@ export default function NavigationSearch() {
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-          placeholder="Search people..."
+          placeholder={t('placeholder')}
           className="w-full pl-9 pr-3 py-1.5 text-sm border-2 border-border rounded-lg bg-surface-elevated text-foreground placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
           autoComplete="off"
         />
@@ -164,7 +166,7 @@ export default function NavigationSearch() {
 
       {isOpen && isLoading && (
         <div className="absolute z-50 w-full mt-1 bg-surface border-2 border-primary/30 rounded-lg shadow-lg shadow-primary/20 p-3">
-          <p className="text-sm text-muted">Searching...</p>
+          <p className="text-sm text-muted">{t('searching')}</p>
         </div>
       )}
 
@@ -193,7 +195,7 @@ export default function NavigationSearch() {
       {isOpen && !isLoading && searchTerm && results.length === 0 && (
         <div className="absolute z-50 w-full mt-1 bg-surface border-2 border-tertiary/30 rounded-lg shadow-lg shadow-tertiary/20 p-3">
           <p className="text-sm text-muted">
-            No people found matching &quot;{searchTerm}&quot;
+            {t('noResults', { searchTerm })}
           </p>
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from '../ui/Button';
 
 interface ApplyPromoFormProps {
@@ -9,11 +10,26 @@ interface ApplyPromoFormProps {
 }
 
 export default function ApplyPromoForm({ hasActivePromo }: ApplyPromoFormProps) {
+  const t = useTranslations('settings.billing');
   const router = useRouter();
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Helper function to translate known error messages from the server
+  const translateError = (errorMessage: string): string => {
+    const errorMap: Record<string, string> = {
+      'Invalid promotion code': t('promoErrors.invalidCode'),
+      'This promotion is no longer active': t('promoErrors.notActive'),
+      'This promotion has reached its redemption limit': t('promoErrors.reachedLimit'),
+      'This promotion is not yet active': t('promoErrors.notYetActive'),
+      'This promotion has expired': t('promoErrors.expired'),
+      'You already have an active promotion': t('promoErrors.alreadyHavePromo'),
+    };
+
+    return errorMap[errorMessage] || errorMessage;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,14 +49,14 @@ export default function ApplyPromoForm({ hasActivePromo }: ApplyPromoFormProps) 
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Promotion applied successfully!');
+        setSuccess(t('promoSuccess'));
         setCode('');
         router.refresh();
       } else {
-        setError(data.error || 'Failed to apply promotion');
+        setError(translateError(data.error) || t('promoError'));
       }
     } catch {
-      setError('An error occurred. Please try again.');
+      setError(t('promoErrorGeneric'));
     } finally {
       setLoading(false);
     }
@@ -54,7 +70,7 @@ export default function ApplyPromoForm({ hasActivePromo }: ApplyPromoFormProps) 
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="promo-code" className="block text-sm font-medium text-muted">
-          Promotion Code
+          {t('promoCode')}
         </label>
         <div className="mt-1 flex gap-2">
           <input
@@ -62,14 +78,14 @@ export default function ApplyPromoForm({ hasActivePromo }: ApplyPromoFormProps) 
             id="promo-code"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
-            placeholder="Enter code"
+            placeholder={t('promoCodePlaceholder')}
             className="flex-1 px-3 py-2 border border-border rounded-lg bg-surface text-foreground placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <Button
             type="submit"
             disabled={loading || !code.trim()}
           >
-            {loading ? 'Applying...' : 'Apply'}
+            {loading ? t('applying') : t('applyCode')}
           </Button>
         </div>
       </div>

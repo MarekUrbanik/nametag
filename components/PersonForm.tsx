@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import PersonAutocomplete from './PersonAutocomplete';
 import GroupsSelector from './GroupsSelector';
 import ImportantDatesManager from './ImportantDatesManager';
@@ -92,6 +93,7 @@ export default function PersonForm({
   initialRelationshipType,
   reminderLimit,
 }: PersonFormProps) {
+  const t = useTranslations('people.form');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -105,7 +107,7 @@ export default function PersonForm({
     initialKnownThrough || 'user'
   );
   const [knownThroughName, setKnownThroughName] = useState<string>(
-    initialKnownThroughPerson ? `${initialKnownThroughPerson.name}${initialKnownThroughPerson.surname ? ' ' + initialKnownThroughPerson.surname : ''}` : 'You'
+    initialKnownThroughPerson ? `${initialKnownThroughPerson.name}${initialKnownThroughPerson.surname ? ' ' + initialKnownThroughPerson.surname : ''}` : t('you')
   );
   const [inheritGroups, setInheritGroups] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -180,7 +182,7 @@ export default function PersonForm({
 
   // Create list of people including the user for autocomplete
   const peopleWithUser = [
-    { id: 'user', name: 'You', surname: null, nickname: null, groups: [] },
+    { id: 'user', name: t('you'), surname: null, nickname: null, groups: [] },
     ...availablePeople
   ];
 
@@ -192,7 +194,7 @@ export default function PersonForm({
     if (formData.lastContact) {
       const lastContactDate = new Date(formData.lastContact);
       if (lastContactDate > new Date()) {
-        setError('Last contact date cannot be in the future');
+        setError(t('errorFutureDate'));
         return;
       }
     }
@@ -218,7 +220,7 @@ export default function PersonForm({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Something went wrong');
+        setError(data.error || t('errorSomethingWrong'));
         return;
       }
 
@@ -226,8 +228,8 @@ export default function PersonForm({
       const displayName = `${formData.name}${formData.surname ? ' ' + formData.surname : ''}`;
       toast.success(
         mode === 'create'
-          ? `${displayName} has been added to your network`
-          : `${displayName}'s information has been updated`
+          ? t('successCreated', { name: displayName })
+          : t('successUpdated', { name: displayName })
       );
 
       // Redirect logic:
@@ -261,7 +263,7 @@ export default function PersonForm({
         router.refresh();
       }
     } catch {
-      setError('Unable to connect to server. Please check your connection and try again.');
+      setError(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -282,7 +284,7 @@ export default function PersonForm({
 
       {/* Details Section */}
       <Section>
-        <SectionHeader>Details</SectionHeader>
+        <SectionHeader>{t('sectionDetails')}</SectionHeader>
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -290,7 +292,7 @@ export default function PersonForm({
                 htmlFor="name"
                 className="block text-sm font-medium text-muted mb-1"
               >
-                Name *
+                {t('nameRequired')}
               </label>
               <input
                 type="text"
@@ -309,7 +311,7 @@ export default function PersonForm({
                 htmlFor="surname"
                 className="block text-sm font-medium text-muted mb-1"
               >
-                Surname
+                {t('surnameLabel')}
               </label>
               <input
                 type="text"
@@ -327,7 +329,7 @@ export default function PersonForm({
                 htmlFor="nickname"
                 className="block text-sm font-medium text-muted mb-1"
               >
-                Nickname
+                {t('nicknameLabel')}
               </label>
               <input
                 type="text"
@@ -347,16 +349,16 @@ export default function PersonForm({
                 htmlFor="knownThrough"
                 className="block text-sm font-medium text-muted mb-1"
               >
-                Known Through
+                {t('knownThroughLabel')}
               </label>
               <PersonAutocomplete
                 people={peopleWithUser}
                 value={knownThroughId}
                 onChange={handleKnownThroughChange}
-                placeholder="Search for a person..."
+                placeholder={t('searchForPerson')}
               />
               <p className="text-xs text-muted mt-1">
-                Select who connects you to this person. For example, if adding your friend&apos;s child, select your friend.
+                {t('knownThroughHelp')}
               </p>
             </div>
           )}
@@ -367,7 +369,7 @@ export default function PersonForm({
                 htmlFor="relationshipToUserId"
                 className="flex items-center gap-1.5 text-sm font-medium text-muted mb-1"
               >
-                Relationship to You
+                {t('relationshipToYouDirect')}
                 <div className="group relative inline-block">
                   <svg
                     className="w-4 h-4 text-muted cursor-help"
@@ -383,7 +385,7 @@ export default function PersonForm({
                     />
                   </svg>
                   <div className="invisible group-hover:visible absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-surface-elevated text-foreground text-xs rounded-lg whitespace-nowrap z-10 pointer-events-none">
-                    You can create custom relationship types in the Relationships section
+                    {t('relationshipToYouTooltip')}
                     <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-surface-elevated"></div>
                   </div>
                 </div>
@@ -396,7 +398,7 @@ export default function PersonForm({
                 }
                 className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="">Select a relationship...</option>
+                <option value="">{t('selectRelationship')}</option>
                 {relationshipTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.label}
@@ -408,7 +410,7 @@ export default function PersonForm({
 
           {mode === 'edit' && !person?.relationshipToUserId && (
             <div className="bg-primary/10 border border-primary text-primary px-4 py-3 rounded">
-              This person is connected to you through other people in your network, not directly.
+              {t('indirectConnection')}
             </div>
           )}
 
@@ -418,7 +420,7 @@ export default function PersonForm({
                 htmlFor="relationshipToUserId"
                 className="flex items-center gap-1.5 text-sm font-medium text-muted mb-1"
               >
-                Relationship to {knownThroughName} *
+                {t('relationshipToYouDirect')} *
                 <div className="group relative inline-block">
                   <svg
                     className="w-4 h-4 text-muted cursor-help"
@@ -434,7 +436,7 @@ export default function PersonForm({
                     />
                   </svg>
                   <div className="invisible group-hover:visible absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-surface-elevated text-foreground text-xs rounded-lg whitespace-nowrap z-10 pointer-events-none">
-                    You can create custom relationship types in the Relationships section
+                    {t('relationshipToYouTooltip')}
                     <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-surface-elevated"></div>
                   </div>
                 </div>
@@ -448,7 +450,7 @@ export default function PersonForm({
                 }
                 className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="">Select a relationship...</option>
+                <option value="">{t('selectRelationship')}</option>
                 {relationshipTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.label}
@@ -464,7 +466,7 @@ export default function PersonForm({
                 htmlFor="relationshipToKnownThrough"
                 className="flex items-center gap-1.5 text-sm font-medium text-muted mb-1"
               >
-                Relationship to {knownThroughName} *
+                {t('relationshipToRequired', { name: knownThroughName })}
                 <div className="group relative inline-block">
                   <svg
                     className="w-4 h-4 text-muted cursor-help"
@@ -480,7 +482,7 @@ export default function PersonForm({
                     />
                   </svg>
                   <div className="invisible group-hover:visible absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-surface-elevated text-foreground text-xs rounded-lg whitespace-nowrap z-10 pointer-events-none">
-                    You can create custom relationship types in the Relationships section
+                    {t('relationshipToYouTooltip')}
                     <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-surface-elevated"></div>
                   </div>
                 </div>
@@ -494,7 +496,7 @@ export default function PersonForm({
                 }
                 className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                <option value="">Select a relationship...</option>
+                <option value="">{t('selectRelationship')}</option>
                 {relationshipTypes.map((type) => (
                   <option key={type.id} value={type.id}>
                     {type.label}
@@ -502,7 +504,7 @@ export default function PersonForm({
                 ))}
               </select>
               <p className="text-xs text-muted mt-1">
-                This person will be connected to {knownThroughName}, not directly to you.
+                {t('willBeConnectedTo', { name: knownThroughName })}
               </p>
             </div>
           )}
@@ -512,17 +514,17 @@ export default function PersonForm({
               htmlFor="notes"
               className="block text-sm font-medium text-muted mb-1"
             >
-              Notes
+              {t('notesLabel')}
             </label>
             <MarkdownEditor
               id="notes"
               value={formData.notes}
               onChange={(notes) => setFormData({ ...formData, notes })}
-              placeholder="Add notes about this person..."
+              placeholder={t('notesPlaceholder')}
               rows={4}
             />
             <p className="text-xs text-muted mt-1">
-              Supports Markdown formatting
+              {t('markdownSupport')}
             </p>
           </div>
         </div>
@@ -531,7 +533,7 @@ export default function PersonForm({
       {/* Groups Section */}
       {groups.length > 0 && (
         <Section>
-          <SectionHeader>Groups</SectionHeader>
+          <SectionHeader>{t('sectionGroups')}</SectionHeader>
           {mode === 'create' && knownThroughId !== 'user' && selectedBasePerson && selectedBasePerson.groups.length > 0 && (
             <div className="mb-4 flex items-center">
               <input
@@ -542,7 +544,7 @@ export default function PersonForm({
                 className="w-4 h-4 text-primary bg-surface-elevated border-border rounded focus:ring-primary"
               />
               <label htmlFor="inheritGroups" className="ml-2 text-sm text-muted">
-                Inherit groups from {selectedBasePerson.name}{selectedBasePerson.surname ? ' ' + selectedBasePerson.surname : ''}
+                {t('inheritGroups', { name: `${selectedBasePerson.name}${selectedBasePerson.surname ? ' ' + selectedBasePerson.surname : ''}` })}
               </label>
             </div>
           )}
@@ -556,7 +558,7 @@ export default function PersonForm({
 
       {/* Last Contact Section */}
       <Section>
-        <SectionHeader>Last Contact</SectionHeader>
+        <SectionHeader>{t('sectionLastContact')}</SectionHeader>
         <div className="space-y-3">
           <div className="flex gap-2">
             <input
@@ -574,7 +576,7 @@ export default function PersonForm({
               variant="secondary"
               onClick={setLastContactToToday}
             >
-              Today
+              {t('todayButton')}
             </Button>
           </div>
 
@@ -615,7 +617,7 @@ export default function PersonForm({
                       htmlFor="contact-reminder-toggle"
                       className={`text-sm ${canToggleContactReminder && formData.contactReminderEnabled ? 'text-muted' : 'text-muted'}`}
                     >
-                      Remind me to catch up after
+                      {t('remindMeToCatchUp')}
                     </label>
                     <input
                       type="number"
@@ -646,15 +648,15 @@ export default function PersonForm({
                       }
                       className="px-2 py-1 text-sm border border-border rounded bg-surface text-foreground focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <option value="DAYS">days</option>
-                      <option value="WEEKS">weeks</option>
-                      <option value="MONTHS">months</option>
-                      <option value="YEARS">years</option>
+                      <option value="DAYS">{t('days')}</option>
+                      <option value="WEEKS">{t('weeks')}</option>
+                      <option value="MONTHS">{t('months')}</option>
+                      <option value="YEARS">{t('years')}</option>
                     </select>
                   </div>
                   {!canToggleContactReminder && reminderLimit && !reminderLimit.isUnlimited && (
                     <p className="text-xs text-amber-600 dark:text-amber-400 mt-2">
-                      Reminder limit reached ({reminderLimit.limit}). Upgrade to add more.
+                      {t('reminderLimitReached', { limit: reminderLimit.limit })}
                     </p>
                   )}
                 </>
@@ -666,7 +668,7 @@ export default function PersonForm({
 
       {/* Important Dates Section */}
       <Section>
-        <SectionHeader>Important Dates</SectionHeader>
+        <SectionHeader>{t('sectionImportantDates')}</SectionHeader>
         <ImportantDatesManager
           personId={person?.id}
           initialDates={importantDates}
@@ -681,7 +683,7 @@ export default function PersonForm({
           href="/people"
           className="px-6 py-2 border border-border text-muted rounded-lg font-medium hover:bg-surface-elevated transition-colors"
         >
-          Cancel
+          {t('cancel')}
         </Link>
 
         {mode === 'create' ? (
@@ -692,7 +694,7 @@ export default function PersonForm({
                 disabled={isLoading}
                 className="px-6 py-2 bg-primary text-white rounded-l-lg font-semibold hover:bg-primary-dark transition-colors shadow-lg hover:shadow-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Saving...' : 'Create'}
+                {isLoading ? t('saving') : t('create')}
               </button>
               <button
                 type="button"
@@ -729,7 +731,7 @@ export default function PersonForm({
                   }}
                   className="w-full text-left px-4 py-2 text-sm text-muted hover:bg-surface-elevated rounded-lg transition-colors"
                 >
-                  Create and add another
+                  {t('createAndAddAnother')}
                 </button>
               </div>
             )}
@@ -740,7 +742,7 @@ export default function PersonForm({
             disabled={isLoading}
             className="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors shadow-lg hover:shadow-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Saving...' : 'Save'}
+            {isLoading ? t('saving') : t('save')}
           </button>
         )}
       </div>

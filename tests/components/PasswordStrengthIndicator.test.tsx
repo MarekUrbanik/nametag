@@ -1,43 +1,53 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { NextIntlClientProvider } from 'next-intl';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
+import enMessages from '../../locales/en.json';
+
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <NextIntlClientProvider locale="en" messages={enMessages}>
+      {children}
+    </NextIntlClientProvider>
+  );
+}
 
 describe('PasswordStrengthIndicator', () => {
   describe('Strength Calculation', () => {
     it('should show nothing for empty password', () => {
-      const { container } = render(<PasswordStrengthIndicator password="" />);
+      const { container } = render(<PasswordStrengthIndicator password="" />, { wrapper: Wrapper });
       expect(container.firstChild).toBeNull();
     });
 
     it('should show "Very Weak" for password with only 1 requirement', () => {
-      const { container } = render(<PasswordStrengthIndicator password="aaaa" />);
+      const { container } = render(<PasswordStrengthIndicator password="aaaa" />, { wrapper: Wrapper });
       expect(container).toHaveTextContent('Very Weak');
     });
 
     it('should show "Weak" for password with 2 requirements', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Aaaa" />);
+      const { container } = render(<PasswordStrengthIndicator password="Aaaa" />, { wrapper: Wrapper });
       expect(container).toHaveTextContent('Weak');
     });
 
     it('should show "Medium" for password with 3 requirements', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Aaa1" />);
+      const { container } = render(<PasswordStrengthIndicator password="Aaa1" />, { wrapper: Wrapper });
       expect(container).toHaveTextContent('Medium');
     });
 
     it('should show "Strong" for password with 4 requirements', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Pass1!ab" />);
+      const { container } = render(<PasswordStrengthIndicator password="Pass1!ab" />, { wrapper: Wrapper });
       expect(container).toHaveTextContent('Strong');
     });
 
     it('should show "Very Strong" for password meeting all 5 requirements', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Password1!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Password1!" />, { wrapper: Wrapper });
       expect(container).toHaveTextContent('Very Strong');
     });
   });
 
   describe('Requirements Display', () => {
     it('should show all requirements by default', () => {
-      render(<PasswordStrengthIndicator password="test" />);
+      render(<PasswordStrengthIndicator password="test" />, { wrapper: Wrapper });
       
       expect(screen.getByText(/At least 8 characters/i)).toBeInTheDocument();
       expect(screen.getByText(/One uppercase letter/i)).toBeInTheDocument();
@@ -47,13 +57,13 @@ describe('PasswordStrengthIndicator', () => {
     });
 
     it('should hide requirements when showRequirements is false', () => {
-      render(<PasswordStrengthIndicator password="test" showRequirements={false} />);
+      render(<PasswordStrengthIndicator password="test" showRequirements={false} />, { wrapper: Wrapper });
       
       expect(screen.queryByText(/At least 8 characters/i)).not.toBeInTheDocument();
     });
 
     it('should mark met requirements with green checkmark', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Password123!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Password123!" />, { wrapper: Wrapper });
       
       // All requirements should be met (green checkmarks)
       const greenIcons = container.querySelectorAll('.text-green-500');
@@ -61,7 +71,7 @@ describe('PasswordStrengthIndicator', () => {
     });
 
     it('should mark unmet requirements with gray X', () => {
-      const { container } = render(<PasswordStrengthIndicator password="pass" />);
+      const { container } = render(<PasswordStrengthIndicator password="pass" />, { wrapper: Wrapper });
 
       // Most requirements not met (gray X icons)
       const grayIcons = container.querySelectorAll('.text-muted');
@@ -71,31 +81,31 @@ describe('PasswordStrengthIndicator', () => {
 
   describe('Visual Feedback', () => {
     it('should show red bar for very weak password', () => {
-      const { container } = render(<PasswordStrengthIndicator password="pass" />);
+      const { container } = render(<PasswordStrengthIndicator password="pass" />, { wrapper: Wrapper });
       const bar = container.querySelector('.bg-red-500');
       expect(bar).toBeInTheDocument();
     });
 
     it('should show orange bar for weak password', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Aaaa" />);
+      const { container } = render(<PasswordStrengthIndicator password="Aaaa" />, { wrapper: Wrapper });
       const bar = container.querySelector('.bg-orange-500');
       expect(bar).toBeInTheDocument();
     });
 
     it('should show yellow bar for medium password', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Aaa1" />);
+      const { container } = render(<PasswordStrengthIndicator password="Aaa1" />, { wrapper: Wrapper });
       const bar = container.querySelector('.bg-yellow-500');
       expect(bar).toBeInTheDocument();
     });
 
     it('should show blue bar for strong password', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Aa1!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Aa1!" />, { wrapper: Wrapper });
       const bar = container.querySelector('.bg-blue-500');
       expect(bar).toBeInTheDocument();
     });
 
     it('should show green bar for very strong password', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Password1!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Password1!" />, { wrapper: Wrapper });
       const bar = container.querySelector('.bg-green-500');
       expect(bar).toBeInTheDocument();
     });
@@ -103,38 +113,38 @@ describe('PasswordStrengthIndicator', () => {
 
   describe('Specific Requirements', () => {
     it('should detect minimum length requirement', () => {
-      render(<PasswordStrengthIndicator password="Pass1!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Pass1!" />, { wrapper: Wrapper });
 
       // 6 characters, doesn't meet 8 minimum
       const lengthReq = screen.getByText(/At least 8 characters/i);
       expect(lengthReq.parentElement?.querySelector('.text-muted')).toBeInTheDocument();
 
       // 8 characters, meets minimum
-      render(<PasswordStrengthIndicator password="Pass123!" />);
+      const { container: container2 } = render(<PasswordStrengthIndicator password="Pass123!" />, { wrapper: Wrapper });
       const lengthReq2 = screen.getAllByText(/At least 8 characters/i)[1];
       expect(lengthReq2.parentElement?.querySelector('.text-green-500')).toBeInTheDocument();
     });
 
     it('should detect uppercase requirement', () => {
-      render(<PasswordStrengthIndicator password="password123!" />);
+      render(<PasswordStrengthIndicator password="password123!" />, { wrapper: Wrapper });
       const req = screen.getByText(/One uppercase letter/i);
       expect(req.parentElement?.querySelector('.text-muted')).toBeInTheDocument();
     });
 
     it('should detect lowercase requirement', () => {
-      render(<PasswordStrengthIndicator password="PASSWORD123!" />);
+      render(<PasswordStrengthIndicator password="PASSWORD123!" />, { wrapper: Wrapper });
       const req = screen.getByText(/One lowercase letter/i);
       expect(req.parentElement?.querySelector('.text-muted')).toBeInTheDocument();
     });
 
     it('should detect number requirement', () => {
-      render(<PasswordStrengthIndicator password="Password!" />);
+      render(<PasswordStrengthIndicator password="Password!" />, { wrapper: Wrapper });
       const req = screen.getByText(/One number/i);
       expect(req.parentElement?.querySelector('.text-muted')).toBeInTheDocument();
     });
 
     it('should detect special character requirement', () => {
-      render(<PasswordStrengthIndicator password="Password123" />);
+      render(<PasswordStrengthIndicator password="Password123" />, { wrapper: Wrapper });
       const req = screen.getByText(/One special character/i);
       expect(req.parentElement?.querySelector('.text-muted')).toBeInTheDocument();
     });
@@ -153,7 +163,7 @@ describe('PasswordStrengthIndicator', () => {
 
     testCases.forEach(({ password, expectedLabel, expectedScore }) => {
       it(`should evaluate "${password}" as ${expectedLabel} (score: ${expectedScore})`, () => {
-        const { container } = render(<PasswordStrengthIndicator password={password} />);
+        const { container } = render(<PasswordStrengthIndicator password={password} />, { wrapper: Wrapper });
         
         if (expectedLabel) {
           expect(container).toHaveTextContent(expectedLabel);
@@ -164,7 +174,7 @@ describe('PasswordStrengthIndicator', () => {
 
   describe('Accessibility', () => {
     it('should have meaningful color-coded feedback', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Password123!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Password123!" />, { wrapper: Wrapper });
       
       // Should have green color for very strong
       expect(container.querySelector('.text-green-600')).toBeInTheDocument();
@@ -172,7 +182,7 @@ describe('PasswordStrengthIndicator', () => {
     });
 
     it('should show checkmarks for met requirements', () => {
-      const { container } = render(<PasswordStrengthIndicator password="Password123!" />);
+      const { container } = render(<PasswordStrengthIndicator password="Password123!" />, { wrapper: Wrapper });
 
       // All 5 requirements should show green checkmarks
       const greenCheckmarks = container.querySelectorAll('.text-green-500');

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { getDateFormatExample } from '@/lib/date-format';
 
 interface DateFormatSelectorProps {
@@ -10,10 +11,12 @@ interface DateFormatSelectorProps {
 }
 
 export default function DateFormatSelector({ currentFormat }: DateFormatSelectorProps) {
+  const t = useTranslations('settings.appearance');
   const router = useRouter();
   const [dateFormat, setDateFormat] = useState(currentFormat);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const formats: Array<{ value: 'MDY' | 'DMY' | 'YMD'; label: string }> = [
     { value: 'MDY', label: 'MM/DD/YYYY' },
@@ -24,6 +27,7 @@ export default function DateFormatSelector({ currentFormat }: DateFormatSelector
   const handleFormatChange = async (newFormat: 'MDY' | 'DMY' | 'YMD') => {
     setIsLoading(true);
     setMessage('');
+    setIsSuccess(false);
 
     try {
       const response = await fetch('/api/user/date-format', {
@@ -37,18 +41,21 @@ export default function DateFormatSelector({ currentFormat }: DateFormatSelector
       const data = await response.json();
 
       if (!response.ok) {
-        setMessage(data.error || 'Failed to update date format');
+        setMessage(data.error || t('dateFormatError'));
+        setIsSuccess(false);
         return;
       }
 
       setDateFormat(newFormat);
-      setMessage('Date format updated successfully');
+      setMessage(t('dateFormatSuccess'));
+      setIsSuccess(true);
       router.refresh();
 
       // Clear success message after 2 seconds
       setTimeout(() => setMessage(''), 2000);
     } catch {
-      setMessage('Failed to update date format');
+      setMessage(t('dateFormatError'));
+      setIsSuccess(false);
     } finally {
       setIsLoading(false);
     }
@@ -57,7 +64,7 @@ export default function DateFormatSelector({ currentFormat }: DateFormatSelector
   return (
     <div>
       <p className="text-sm text-muted mb-4">
-        Choose how dates are displayed throughout the app
+        {t('dateFormatDescription')}
       </p>
 
       <div className="space-y-3">
@@ -78,7 +85,7 @@ export default function DateFormatSelector({ currentFormat }: DateFormatSelector
                   {format.label}
                 </div>
                 <div className="text-sm text-muted">
-                  Example: {getDateFormatExample(format.value)}
+                  {t('dateFormatExample')}: {getDateFormatExample(format.value)}
                 </div>
               </div>
               {dateFormat === format.value && (
@@ -94,7 +101,7 @@ export default function DateFormatSelector({ currentFormat }: DateFormatSelector
       </div>
 
       {message && (
-        <p className={`mt-4 text-sm ${message.includes('success') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <p className={`mt-4 text-sm ${isSuccess ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {message}
         </p>
       )}

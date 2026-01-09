@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import PillSelector from './PillSelector';
 
 interface Group {
@@ -15,6 +16,7 @@ interface GroupsSelectorProps {
   selectedGroupIds: string[];
   onChange: (groupIds: string[]) => void;
   allowCreate?: boolean;
+  placeholder?: string;
 }
 
 // Generate a random color from a nice palette
@@ -33,7 +35,9 @@ export default function GroupsSelector({
   selectedGroupIds,
   onChange,
   allowCreate = true,
+  placeholder,
 }: GroupsSelectorProps) {
+  const t = useTranslations('people.form.groups');
   // Track newly created groups that aren't in the original list
   const [createdGroups, setCreatedGroups] = useState<Group[]>([]);
   const [isCreating, setIsCreating] = useState(false);
@@ -79,7 +83,7 @@ export default function GroupsSelector({
       const data = await response.json();
 
       if (!response.ok) {
-        toast.error(data.error || 'Failed to create group');
+        toast.error(data.error || t('errorCreate'));
         return;
       }
 
@@ -95,9 +99,9 @@ export default function GroupsSelector({
       // Auto-select the newly created group
       onChange([...selectedGroupIds, newGroup.id]);
 
-      toast.success(`Group "${name}" created`);
+      toast.success(t('groupCreated', { name }));
     } catch {
-      toast.error('Failed to create group');
+      toast.error(t('errorCreate'));
     } finally {
       setIsCreating(false);
     }
@@ -123,7 +127,7 @@ export default function GroupsSelector({
           onRemove();
         }}
         className="hover:bg-surface-elevated rounded-full p-0.5 transition-colors text-muted"
-        aria-label={`Remove ${item.label}`}
+        aria-label={`${t('remove')} ${item.label}`}
       >
         <svg
           className="w-4 h-4"
@@ -161,7 +165,7 @@ export default function GroupsSelector({
           </svg>
           <div className="flex-1">
             <p className="text-sm text-blue-800 dark:text-blue-300">
-              <span className="font-medium">Quick tip:</span> Don&apos;t see a group? Just type its name and press <kbd className="px-1.5 py-0.5 text-xs bg-surface border border-blue-300 dark:border-blue-600 rounded">Enter</kbd> to create it on the fly!
+              <span className="font-medium">{t('quickTip')}</span> {t('quickTipMessage')}
             </p>
           </div>
         </div>
@@ -172,10 +176,10 @@ export default function GroupsSelector({
         onAdd={handleAdd}
         onRemove={handleRemove}
         onCreateNew={allowCreate ? handleCreateNew : undefined}
-        placeholder="Type to search or create groups..."
-        emptyMessage="No groups found matching"
-        createNewLabel="Create group"
-        helpText="Click × on a group to remove it."
+        placeholder={placeholder || t('placeholder')}
+        emptyMessage={t('emptyMessage')}
+        createNewLabel={t('createGroup')}
+        helpText={t('helpText')}
         showAllOnFocus={true}
         renderPill={renderGroupPill}
         isLoading={isCreating}

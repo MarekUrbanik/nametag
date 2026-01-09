@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { formatFullName } from '@/lib/nameUtils';
 
 interface Person {
@@ -29,6 +30,7 @@ export default function PersonAutocomplete({
   onCreateNew,
   highlightPersonId,
 }: PersonAutocompleteProps) {
+  const t = useTranslations('people');
   const [searchTerm, setSearchTerm] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(0);
@@ -175,7 +177,7 @@ export default function PersonAutocomplete({
                   {formatFullName(person)}
                 </span>
                 {person.id === highlightPersonId && (
-                  <span className="font-normal"> (you)</span>
+                  <span className="font-normal"> {t('youLabel')}</span>
                 )}
               </div>
             </button>
@@ -199,7 +201,7 @@ export default function PersonAutocomplete({
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>Create &quot;{searchTerm}&quot;</span>
+                  <span>{t('createPerson', { name: searchTerm })}</span>
                 </div>
               </button>
             </>
@@ -210,7 +212,7 @@ export default function PersonAutocomplete({
       {isOpen && searchTerm && filteredPeople.length === 0 && !onCreateNew && (
         <div className="absolute z-10 w-full mt-1 bg-surface border border-border rounded-lg shadow-lg p-3">
           <p className="text-sm text-muted">
-            No people found matching &quot;{searchTerm}&quot;
+            {t('noPersonFound', { searchTerm })}
           </p>
         </div>
       )}

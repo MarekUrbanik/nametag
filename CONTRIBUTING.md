@@ -239,6 +239,88 @@ Then open a pull request on GitHub.
 - Ensure tests pass and build succeeds
 - Update documentation if needed
 
+## Internationalization (i18n)
+
+Nametag supports multiple languages. **All user-facing strings must be translated.**
+
+### Supported Languages
+
+- English (`en`) - Default language
+- Spanish (`es-ES`)
+
+### Adding or Changing Strings
+
+**IMPORTANT**: When adding new features or modifying existing ones, you MUST update all translation files.
+
+1. **Add translation keys to all locale files**:
+   - `/locales/en.json` - English translations
+   - `/locales/es-ES.json` - Spanish translations
+
+2. **Use the translation hook in components**:
+   ```typescript
+   import { useTranslations } from 'next-intl';
+
+   export default function MyComponent() {
+     const t = useTranslations('namespace');
+
+     return <h1>{t('title')}</h1>;
+   }
+   ```
+
+3. **Organize translations with namespaces**:
+   ```json
+   {
+     "people": {
+       "form": {
+         "name": "Name",
+         "email": "Email"
+       }
+     }
+   }
+   ```
+
+4. **Use interpolation for dynamic values**:
+   ```typescript
+   // In locale file:
+   "greeting": "Hello, {name}!"
+
+   // In component:
+   t('greeting', { name: 'John' })
+   ```
+
+### Translation Guidelines
+
+- **Never hardcode user-facing strings** in components
+- Keep translation keys descriptive (e.g., `people.form.name` not `ppl.f.n`)
+- Use the same key structure across all locale files
+- Test in all languages before submitting PR
+- If you don't speak Spanish, use an AI translation tool or ask for help
+
+### Common Translation Patterns
+
+**Error messages**:
+```json
+"errors": {
+  "invalidEmail": "Please enter a valid email",
+  "required": "This field is required"
+}
+```
+
+**Success messages**:
+```json
+"success": {
+  "saved": "Changes saved successfully"
+}
+```
+
+**Form labels**:
+```json
+"form": {
+  "name": "Name",
+  "email": "Email"
+}
+```
+
 ## Code Style
 
 We use ESLint and Prettier for code formatting. Most issues are caught automatically.
@@ -250,6 +332,7 @@ We use ESLint and Prettier for code formatting. Most issues are caught automatic
 - Follow existing patterns in the codebase
 - Keep components small and focused
 - Write meaningful variable and function names
+- **All user-facing strings must use translations (never hardcode text)**
 
 **File organization:**
 - Components go in `/components`
@@ -257,6 +340,7 @@ We use ESLint and Prettier for code formatting. Most issues are caught automatic
 - API routes go in `/app/api`
 - Utilities go in `/lib`
 - Types go alongside the code that uses them
+- Translations go in `/locales` (one file per language)
 
 **React patterns:**
 ```typescript
@@ -322,6 +406,10 @@ try {
   /rate-limit                 # Rate limiting with Redis
   /email                      # Email sending (Resend)
 
+/locales                      # Translation files (i18n)
+  en.json                     # English translations
+  es-ES.json                  # Spanish translations
+
 /prisma                       # Database schema and migrations
   /migrations                 # Migration files
   schema.prisma               # Database schema
@@ -346,6 +434,7 @@ Understanding the stack helps when contributing:
 - **Prisma**: Type-safe database ORM
 - **Redis**: Rate limiting and caching
 - **NextAuth.js**: Authentication (credentials provider)
+- **next-intl**: Internationalization (i18n) with support for English and Spanish
 - **Resend**: Transactional emails
 - **Stripe**: Payment processing (subscription billing)
 - **D3.js**: Network graph visualization

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import ReactMarkdown from 'react-markdown';
 
 interface MarkdownEditorProps {
@@ -39,6 +40,7 @@ export default function MarkdownEditor({
   rows = 4,
   id,
 }: MarkdownEditorProps) {
+  const t = useTranslations('people.form.markdown');
   const [showPreview, setShowPreview] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -145,35 +147,35 @@ export default function MarkdownEditor({
       {/* Toolbar */}
       <div className="flex items-center justify-between border-b border-border bg-background px-2 py-1">
         <div className="flex items-center gap-0.5">
-          <ToolbarButton onClick={() => insertFormat('bold')} title="Bold (Ctrl+B)">
+          <ToolbarButton onClick={() => insertFormat('bold')} title={t('bold')}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z" />
             </svg>
           </ToolbarButton>
-          <ToolbarButton onClick={() => insertFormat('italic')} title="Italic (Ctrl+I)">
+          <ToolbarButton onClick={() => insertFormat('italic')} title={t('italic')}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10 4h4m-2 0l-4 16m0 0h4" />
             </svg>
           </ToolbarButton>
           <div className="w-px h-4 bg-surface-elevated mx-1" />
-          <ToolbarButton onClick={() => insertFormat('heading')} title="Heading">
+          <ToolbarButton onClick={() => insertFormat('heading')} title={t('heading')}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10" />
             </svg>
           </ToolbarButton>
-          <ToolbarButton onClick={() => insertFormat('quote')} title="Quote">
+          <ToolbarButton onClick={() => insertFormat('quote')} title={t('quote')}>
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M6 17h3l2-4V7H5v6h3l-2 4zm8 0h3l2-4V7h-6v6h3l-2 4z" />
             </svg>
           </ToolbarButton>
           <div className="w-px h-4 bg-surface-elevated mx-1" />
-          <ToolbarButton onClick={() => insertFormat('list')} title="Bullet List">
+          <ToolbarButton onClick={() => insertFormat('list')} title={t('bulletList')}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h.01M8 6h12M4 12h.01M8 12h12M4 18h.01M8 18h12" />
             </svg>
           </ToolbarButton>
-          <ToolbarButton onClick={() => insertFormat('numbered-list')} title="Numbered List">
+          <ToolbarButton onClick={() => insertFormat('numbered-list')} title={t('numberedList')}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h.01M4 6v.01M8 6h12M4 12h.01M4 12v.01M8 12h12M4 18h.01M4 18v.01M8 18h12" />
               <text x="2" y="7" fontSize="5" fill="currentColor" stroke="none">1</text>
@@ -182,7 +184,7 @@ export default function MarkdownEditor({
             </svg>
           </ToolbarButton>
           <div className="w-px h-4 bg-surface-elevated mx-1" />
-          <ToolbarButton onClick={() => insertFormat('link')} title="Link">
+          <ToolbarButton onClick={() => insertFormat('link')} title={t('link')}>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
             </svg>
@@ -198,7 +200,7 @@ export default function MarkdownEditor({
                 : 'text-muted hover:bg-surface-elevated'
             }`}
           >
-            {showPreview ? 'Edit' : 'Preview'}
+            {showPreview ? t('edit') : t('preview')}
           </button>
         </div>
       </div>
@@ -209,7 +211,7 @@ export default function MarkdownEditor({
           {value ? (
             <ReactMarkdown>{value}</ReactMarkdown>
           ) : (
-            <p className="text-muted italic">Nothing to preview</p>
+            <p className="text-muted italic">{t('nothingToPreview')}</p>
           )}
         </div>
       ) : (

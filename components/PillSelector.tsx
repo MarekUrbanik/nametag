@@ -24,6 +24,9 @@ interface PillSelectorProps<T extends PillItem> {
   showAllOnFocus?: boolean;
   isLoading?: boolean;
   onClearAll?: () => void;
+  removeAriaLabel?: string;
+  clearAllAriaLabel?: string;
+  allSelectedMessage?: string;
 }
 
 export default function PillSelector<T extends PillItem>({
@@ -42,6 +45,9 @@ export default function PillSelector<T extends PillItem>({
   showAllOnFocus = false,
   isLoading = false,
   onClearAll,
+  removeAriaLabel = 'Remove',
+  clearAllAriaLabel = 'Clear all',
+  allSelectedMessage = 'All items are already selected',
 }: PillSelectorProps<T>) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -149,7 +155,7 @@ export default function PillSelector<T extends PillItem>({
         }}
         disabled={isLoading}
         className="hover:bg-blue-200 dark:hover:bg-blue-800 rounded-full p-0.5 transition-colors disabled:opacity-50"
-        aria-label={`Remove ${item.label}`}
+        aria-label={`${removeAriaLabel} ${item.label}`}
       >
         <svg
           className="w-4 h-4"
@@ -238,8 +244,8 @@ export default function PillSelector<T extends PillItem>({
               onMouseDown={(e) => e.preventDefault()}
               disabled={isLoading}
               className="flex-shrink-0 p-1 text-muted hover:text-primary hover:bg-primary/10 rounded transition-colors disabled:opacity-50"
-              aria-label="Clear all"
-              title="Clear all"
+              aria-label={clearAllAriaLabel}
+              title={clearAllAriaLabel}
             >
               <svg
                 className="w-5 h-5"
@@ -313,7 +319,7 @@ export default function PillSelector<T extends PillItem>({
             </div>
           ) : (
             <div className="px-4 py-3 text-sm text-muted">
-              All items are already selected
+              {allSelectedMessage}
             </div>
           )}
         </div>

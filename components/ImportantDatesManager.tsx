@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 type ReminderType = 'ONCE' | 'RECURRING';
 type ReminderIntervalUnit = 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS';
@@ -46,6 +47,8 @@ export default function ImportantDatesManager({
   mode,
   reminderLimit,
 }: ImportantDatesManagerProps) {
+  const t = useTranslations('people.form.importantDates');
+  const tForm = useTranslations('people.form');
   const [dates, setDates] = useState<ImportantDate[]>(initialDates);
   const [isAdding, setIsAdding] = useState(false);
   const [newDate, setNewDate] = useState<ImportantDate>({ ...defaultNewDate });
@@ -178,11 +181,12 @@ export default function ImportantDatesManager({
   const getReminderDescription = (date: ImportantDate) => {
     if (!date.reminderEnabled) return null;
     if (date.reminderType === 'ONCE') {
-      return 'Remind once';
+      return t('remindOnceShort');
     }
     if (date.reminderType === 'RECURRING' && date.reminderInterval && date.reminderIntervalUnit) {
       const unit = date.reminderIntervalUnit.toLowerCase();
-      return `Remind every ${date.reminderInterval} ${date.reminderInterval === 1 ? unit.slice(0, -1) : unit}`;
+      const translatedUnit = date.reminderInterval === 1 ? tForm(unit.slice(0, -1)) : tForm(unit);
+      return t('remindEveryShort', { interval: date.reminderInterval, unit: translatedUnit });
     }
     return null;
   };
@@ -232,12 +236,12 @@ export default function ImportantDatesManager({
             htmlFor={`${idPrefix}-reminder-toggle`}
             className={`text-xs font-medium ${canToggle ? 'text-muted' : 'text-muted'}`}
           >
-            Remind me
+            {t('remindMe')}
           </label>
         </div>
         {!canToggle && limitMessage && (
           <p className="text-xs text-amber-600 dark:text-amber-400 mb-3">
-            {limitMessage}
+            {t('reminderLimitReached', { limit: reminderLimit?.limit ?? 0 })}
           </p>
         )}
 
@@ -254,7 +258,7 @@ export default function ImportantDatesManager({
                     className="h-4 w-4 text-blue-600 border-border focus:ring-blue-500"
                   />
                   <span className="text-xs text-muted">
-                    Only once on the specified date
+                    {t('onlyOnce')}
                   </span>
                 </label>
               )}
@@ -266,7 +270,7 @@ export default function ImportantDatesManager({
                   onChange={() => onChange({ reminderType: 'RECURRING' })}
                   className="h-4 w-4 text-blue-600 border-border focus:ring-blue-500"
                 />
-                <span className="text-xs text-muted">Every</span>
+                <span className="text-xs text-muted">{t('every')}</span>
                 <input
                   type="number"
                   min="1"
@@ -282,13 +286,13 @@ export default function ImportantDatesManager({
                   disabled={date.reminderType !== 'RECURRING'}
                   className="px-2 py-1 text-xs border border-border rounded bg-surface text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <option value="DAYS">days</option>
-                  <option value="WEEKS">weeks</option>
-                  <option value="MONTHS">months</option>
-                  <option value="YEARS">years</option>
+                  <option value="DAYS">{tForm('days')}</option>
+                  <option value="WEEKS">{tForm('weeks')}</option>
+                  <option value="MONTHS">{tForm('months')}</option>
+                  <option value="YEARS">{tForm('years')}</option>
                 </select>
                 <span className={`text-xs ${date.reminderType === 'RECURRING' ? 'text-muted' : 'text-muted'}`}>
-                  starting from the specified date
+                  {t('startingFrom')}
                 </span>
               </label>
             </div>
@@ -307,7 +311,7 @@ export default function ImportantDatesManager({
             onClick={() => setIsAdding(true)}
             className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
           >
-            + Add Date
+            {t('addDate')}
           </button>
         </div>
       )}
@@ -325,7 +329,7 @@ export default function ImportantDatesManager({
                     htmlFor={`edit-date-title-${index}`}
                     className="block text-xs font-medium text-muted mb-1"
                   >
-                    Title
+                    {t('title')}
                   </label>
                   <input
                     type="text"
@@ -340,7 +344,7 @@ export default function ImportantDatesManager({
                     htmlFor={`edit-date-date-${index}`}
                     className="block text-xs font-medium text-muted mb-1"
                   >
-                    Date
+                    {t('date')}
                   </label>
                   <input
                     type="date"
@@ -355,7 +359,6 @@ export default function ImportantDatesManager({
                   onChange={(updates) => setEditingDate({ ...editingDate, ...updates })}
                   idPrefix={`edit-${index}`}
                   canEnable={canAddReminder || !!editingDate.reminderEnabled}
-                  limitMessage={reminderLimit && !reminderLimit.isUnlimited ? `Reminder limit reached (${reminderLimit.limit}). Upgrade to add more.` : undefined}
                 />
                 <div className="flex justify-end space-x-2 pt-2">
                   <button
@@ -363,7 +366,7 @@ export default function ImportantDatesManager({
                     onClick={handleCancelEdit}
                     className="px-3 py-1.5 text-sm text-muted hover:bg-surface-elevated rounded transition-colors"
                   >
-                    Cancel
+                    {t('cancel')}
                   </button>
                   <button
                     type="button"
@@ -371,7 +374,7 @@ export default function ImportantDatesManager({
                     disabled={!editingDate.title.trim() || !editingDate.date}
                     className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark shadow-lg hover:shadow-primary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Save
+                    {t('save')}
                   </button>
                 </div>
               </div>
@@ -403,7 +406,7 @@ export default function ImportantDatesManager({
                     onClick={() => handleStartEdit(index)}
                     disabled={editingIndex !== null || isAdding}
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Edit"
+                    title={t('edit')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -419,7 +422,7 @@ export default function ImportantDatesManager({
                     onClick={() => handleDelete(index, date.id)}
                     disabled={editingIndex !== null || isAdding}
                     className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Delete"
+                    title={t('delete')}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path
@@ -443,14 +446,14 @@ export default function ImportantDatesManager({
                 htmlFor="new-date-title"
                 className="block text-xs font-medium text-muted mb-1"
               >
-                Title
+                {t('title')}
               </label>
               <input
                 type="text"
                 id="new-date-title"
                 value={newDate.title}
                 onChange={(e) => setNewDate({ ...newDate, title: e.target.value })}
-                placeholder="e.g., Birthday, Anniversary"
+                placeholder={t('titlePlaceholder')}
                 className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
                 autoFocus
               />
@@ -460,7 +463,7 @@ export default function ImportantDatesManager({
                 htmlFor="new-date-date"
                 className="block text-xs font-medium text-muted mb-1"
               >
-                Date
+                {t('date')}
               </label>
               <input
                 type="date"
@@ -475,7 +478,6 @@ export default function ImportantDatesManager({
               onChange={(updates) => setNewDate({ ...newDate, ...updates })}
               idPrefix="new"
               canEnable={canAddReminder}
-              limitMessage={reminderLimit && !reminderLimit.isUnlimited ? `Reminder limit reached (${reminderLimit.limit}). Upgrade to add more.` : undefined}
             />
             <div className="flex justify-end space-x-2 pt-2">
               <button
@@ -486,7 +488,7 @@ export default function ImportantDatesManager({
                 }}
                 className="px-3 py-1.5 text-sm text-muted hover:bg-surface-elevated rounded transition-colors"
               >
-                Cancel
+                {t('cancel')}
               </button>
               <button
                 type="button"
@@ -494,7 +496,7 @@ export default function ImportantDatesManager({
                 disabled={!newDate.title.trim() || !newDate.date}
                 className="px-3 py-1.5 text-sm bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark shadow-lg hover:shadow-primary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Add
+                {t('add')}
               </button>
             </div>
           </div>
@@ -502,7 +504,7 @@ export default function ImportantDatesManager({
 
         {dates.length === 0 && !isAdding && (
           <p className="text-sm text-muted py-2">
-            No important dates added yet.
+            {t('noDatesYet')}
           </p>
         )}
       </div>

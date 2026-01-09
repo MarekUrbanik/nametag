@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { NextIntlClientProvider } from 'next-intl';
 import DeleteGroupButton from '../../components/DeleteGroupButton';
+import enMessages from '../../locales/en.json';
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -10,6 +12,15 @@ vi.mock('next/navigation', () => ({
     refresh: vi.fn(),
   })),
 }));
+
+// Wrapper component for tests
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <NextIntlClientProvider locale="en" messages={enMessages}>
+      {children}
+    </NextIntlClientProvider>
+  );
+}
 
 describe('DeleteGroupButton', () => {
   beforeEach(() => {
@@ -20,7 +31,7 @@ describe('DeleteGroupButton', () => {
   describe('Modal opening and closing', () => {
     it('should open confirmation modal when delete button is clicked', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       const deleteButton = screen.getByRole('button', { name: /delete/i });
       await user.click(deleteButton);
@@ -31,7 +42,7 @@ describe('DeleteGroupButton', () => {
 
     it('should close modal and reset state when cancel is clicked', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       // Open modal
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
@@ -59,7 +70,7 @@ describe('DeleteGroupButton', () => {
   describe('Message display', () => {
     it('should display updated deletion message', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Friends" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Friends" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -72,7 +83,7 @@ describe('DeleteGroupButton', () => {
   describe('Delete people checkbox behavior', () => {
     it('should show "Delete all people in this group too" checkbox', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -83,7 +94,7 @@ describe('DeleteGroupButton', () => {
 
     it('should disable delete button when "Delete people" is checked but not confirmed', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -102,7 +113,7 @@ describe('DeleteGroupButton', () => {
 
     it('should show confirmation checkbox when "Delete people" is checked', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -121,7 +132,7 @@ describe('DeleteGroupButton', () => {
 
     it('should enable delete button when both checkboxes are checked', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -145,7 +156,7 @@ describe('DeleteGroupButton', () => {
 
     it('should hide confirmation checkbox when "Delete people" is unchecked', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -166,7 +177,7 @@ describe('DeleteGroupButton', () => {
 
     it('should reset confirmation checkbox when "Delete people" is unchecked', async () => {
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -202,7 +213,7 @@ describe('DeleteGroupButton', () => {
       global.fetch = mockFetch;
 
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
       const modalDeleteButton = screen.getAllByRole('button', { name: /delete/i })[1];
@@ -230,7 +241,7 @@ describe('DeleteGroupButton', () => {
       global.fetch = mockFetch;
 
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -265,7 +276,7 @@ describe('DeleteGroupButton', () => {
       global.fetch = mockFetch;
 
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -300,7 +311,7 @@ describe('DeleteGroupButton', () => {
       global.fetch = mockFetch;
 
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 
@@ -323,7 +334,7 @@ describe('DeleteGroupButton', () => {
       global.fetch = mockFetch;
 
       const user = userEvent.setup();
-      render(<DeleteGroupButton groupId="group-1" groupName="Test Group" />);
+      render(<Wrapper><DeleteGroupButton groupId="group-1" groupName="Test Group" /></Wrapper>);
 
       await user.click(screen.getByRole('button', { name: /^delete$/i }));
 

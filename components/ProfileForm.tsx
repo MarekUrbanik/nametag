@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
+import { useTranslations } from 'next-intl';
 
 interface ProfileFormProps {
   userId: string;
@@ -13,6 +14,7 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ currentName, currentSurname, currentNickname, currentEmail }: ProfileFormProps) {
+  const t = useTranslations('settings.profile');
   const router = useRouter();
   const { update } = useSession();
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +61,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to update profile');
+        setError(data.error || t('errorUpdate'));
         return;
       }
 
@@ -69,7 +71,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
         return;
       }
 
-      setSuccess('Profile updated successfully');
+      setSuccess(t('successUpdate'));
 
       // Update the session with new data
       await update({
@@ -84,7 +86,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
     } catch {
-      setError('Unable to connect to server. Please check your connection and try again.');
+      setError(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -111,7 +113,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
               htmlFor="name"
               className="block text-sm font-medium text-muted mb-1"
             >
-              Name
+              {t('name')}
             </label>
             <input
               type="text"
@@ -128,7 +130,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
               htmlFor="surname"
               className="block text-sm font-medium text-muted mb-1"
             >
-              Surname
+              {t('surname')}
             </label>
             <input
               type="text"
@@ -144,7 +146,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
               htmlFor="nickname"
               className="block text-sm font-medium text-muted mb-1"
             >
-              Nickname
+              {t('nickname')}
             </label>
             <input
               type="text"
@@ -161,7 +163,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
             htmlFor="email"
             className="block text-sm font-medium text-muted mb-1"
           >
-            Email
+            {t('email')}
           </label>
           <input
             type="email"
@@ -179,7 +181,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
             disabled={isLoading}
             className="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark shadow-lg hover:shadow-primary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Saving...' : 'Save Changes'}
+            {isLoading ? t('saving') : t('saveChanges')}
           </button>
         </div>
       </form>
@@ -189,13 +191,13 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-surface rounded-lg shadow-xl max-w-md w-full p-6">
             <h3 className="text-lg font-bold text-foreground mb-4">
-              Confirm Email Change
+              {t('emailChange.title')}
             </h3>
             <p className="text-muted mb-4">
-              You are about to change your email address to <strong className="text-foreground">{formData.email}</strong>.
+              {t('emailChange.message')} <strong className="text-foreground">{formData.email}</strong>.
             </p>
             <p className="text-muted mb-6">
-              A verification email will be sent to your new address. You will be logged out and won&apos;t be able to log in until you verify your new email.
+              {t('emailChange.warning')}
             </p>
             <div className="flex justify-end space-x-3">
               <button
@@ -203,7 +205,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
                 onClick={() => setShowEmailConfirm(false)}
                 className="px-4 py-2 border border-border text-muted rounded-lg font-medium hover:bg-surface-elevated transition-colors"
               >
-                Cancel
+                {t('emailChange.cancel')}
               </button>
               <button
                 type="button"
@@ -211,7 +213,7 @@ export default function ProfileForm({ currentName, currentSurname, currentNickna
                 disabled={isLoading}
                 className="px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark shadow-lg hover:shadow-primary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Saving...' : 'Confirm & Log Out'}
+                {isLoading ? t('saving') : t('emailChange.confirm')}
               </button>
             </div>
           </div>

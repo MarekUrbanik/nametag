@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import ConfirmationModal from './ui/ConfirmationModal';
 import { Button } from './ui/Button';
 
@@ -14,6 +15,7 @@ export default function DeleteGroupButton({
   groupId,
   groupName,
 }: DeleteGroupButtonProps) {
+  const t = useTranslations('groups.delete');
   const router = useRouter();
   const [showConfirm, setShowConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -40,11 +42,11 @@ export default function DeleteGroupButton({
         router.refresh();
       } else {
         const data = await response.json();
-        setError(data.error || 'Failed to delete group. Please try again.');
+        setError(data.error || t('errorGeneric'));
         setIsDeleting(false);
       }
     } catch {
-      setError('Unable to connect to server. Please check your connection and try again.');
+      setError(t('errorConnection'));
       setIsDeleting(false);
     }
   };
@@ -62,27 +64,26 @@ export default function DeleteGroupButton({
   return (
     <>
       <Button variant="danger" onClick={() => setShowConfirm(true)}>
-        Delete
+        {t('button')}
       </Button>
 
       <ConfirmationModal
         isOpen={showConfirm}
         onClose={handleModalClose}
         onConfirm={handleDelete}
-        title="Delete Group"
-        confirmText="Delete"
+        title={t('title')}
+        confirmText={t('confirmButton')}
         isLoading={isDeleting}
-        loadingText="Deleting..."
+        loadingText={t('deleting')}
         error={error}
         variant="danger"
         confirmDisabled={isDeleteDisabled}
       >
         <p className="text-muted mb-1">
-          Are you sure you want to delete{' '}
-          <strong className="text-foreground">{groupName}</strong>?
+          {t('confirmMessage')} <strong className="text-foreground">{groupName}</strong>?
         </p>
         <p className="text-muted mb-4">
-          This action will only remove the group, but will not delete the people themselves.
+          {t('onlyGroupDeleted')}
         </p>
 
         <div className="space-y-3 pt-4 border-t border-border">
@@ -99,7 +100,7 @@ export default function DeleteGroupButton({
               className="mt-1 w-4 h-4 text-red-600 border-border rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800"
             />
             <span className="text-sm text-muted">
-              Delete all people in this group too
+              {t('deletePeopleToo')}
             </span>
           </label>
 
@@ -112,7 +113,7 @@ export default function DeleteGroupButton({
                 className="mt-1 w-4 h-4 text-red-600 border-border rounded focus:ring-red-500 dark:focus:ring-red-600 dark:ring-offset-gray-800"
               />
               <span className="text-sm font-medium text-red-600 dark:text-red-500">
-                Yes, I&apos;m sure!
+                {t('confirmDeletionPeople')}
               </span>
             </label>
           )}

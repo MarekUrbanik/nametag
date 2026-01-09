@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import ConfirmationModal from './ui/ConfirmationModal';
 import { Button } from './ui/Button';
 
@@ -19,6 +20,7 @@ export default function DeletePersonButton({
   personId,
   personName,
 }: DeletePersonButtonProps) {
+  const t = useTranslations('people');
   const router = useRouter();
   const [showConfirm, setShowConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -89,39 +91,38 @@ export default function DeletePersonButton({
   return (
     <>
       <Button variant="danger" onClick={openConfirm}>
-        Delete
+        {t('delete')}
       </Button>
 
       <ConfirmationModal
         isOpen={showConfirm}
         onClose={() => setShowConfirm(false)}
         onConfirm={handleDelete}
-        title="Delete Person"
-        confirmText="Delete"
+        title={t('deletePersonTitle')}
+        confirmText={t('delete')}
         confirmDisabled={isLoadingOrphans}
         isLoading={isDeleting}
-        loadingText="Deleting..."
+        loadingText={t('deleting')}
         error={error}
         variant="danger"
       >
         <p className="text-muted mb-1">
-          Are you sure you want to delete{' '}
-          <strong className="text-foreground">{personName}</strong>?
+          {t('deletePersonConfirm', { name: personName })}
         </p>
         <p className="text-muted mb-4">
-          You can restore deleted items within 30 days.
+          {t('canRestoreWithin30Days')}
         </p>
 
         {isLoadingOrphans && (
           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-400 dark:border-blue-800 text-blue-700 dark:text-blue-400 rounded text-sm">
-            Checking for orphaned people...
+            {t('checkingOrphans')}
           </div>
         )}
 
         {!isLoadingOrphans && orphans.length > 0 && (
           <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-400 dark:border-yellow-800 rounded">
             <p className="text-sm text-yellow-800 dark:text-yellow-400 mb-2">
-              <strong>Note:</strong> Deleting this person will leave others without any relationships, showing them as isolated nodes in the network graph:
+              {t('orphanWarningNote')}
             </p>
             <ul className="text-sm text-yellow-700 dark:text-yellow-300 list-disc list-inside mb-3 space-y-1">
               {orphans.map((orphan) => (
@@ -162,7 +163,7 @@ export default function DeletePersonButton({
                 htmlFor="deleteOrphans"
                 className="ml-2 text-sm text-yellow-800 dark:text-yellow-400 cursor-pointer"
               >
-                Delete them too
+                {t('deleteToo')}
               </label>
             </div>
           </div>

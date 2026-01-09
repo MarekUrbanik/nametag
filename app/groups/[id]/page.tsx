@@ -5,6 +5,9 @@ import { prisma } from '@/lib/prisma';
 import DeleteGroupButton from '@/components/DeleteGroupButton';
 import Navigation from '@/components/Navigation';
 import GroupMembersManager from '@/components/GroupMembersManager';
+import { formatFullName } from '@/lib/nameUtils';
+import { getTranslations } from 'next-intl/server';
+
 
 export default async function GroupDetailsPage({
   params,
@@ -12,6 +15,8 @@ export default async function GroupDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const session = await auth();
+  const t = await getTranslations('groups');
+  const tCommon = await getTranslations('common');
 
   if (!session?.user) {
     redirect('/login');
@@ -78,7 +83,7 @@ export default async function GroupDetailsPage({
               href="/groups"
               className="text-primary hover:underline text-sm"
             >
-              ← Back to Groups
+              {t('backToGroups')}
             </Link>
           </div>
 
@@ -107,7 +112,7 @@ export default async function GroupDetailsPage({
                   href={`/groups/${group.id}/edit`}
                   className="flex-1 sm:flex-none px-4 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors shadow-lg hover:shadow-primary/50 text-center"
                 >
-                  Edit
+                  {tCommon('edit')}
                 </Link>
                 <DeleteGroupButton groupId={group.id} groupName={group.name} />
               </div>

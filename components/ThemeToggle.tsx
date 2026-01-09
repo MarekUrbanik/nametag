@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTheme } from './ThemeProvider';
+import { useTranslations } from 'next-intl';
 import styles from './ThemeToggle.module.css';
 
 interface ThemeToggleProps {
@@ -10,9 +11,11 @@ interface ThemeToggleProps {
 }
 
 export default function ThemeToggle({}: ThemeToggleProps) {
+  const t = useTranslations('settings.appearance');
   const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleThemeChange = async () => {
     if (isLoading) return;
@@ -33,9 +36,14 @@ export default function ThemeToggle({}: ThemeToggleProps) {
       }
 
       setTheme(newTheme);
-      setMessage('Theme updated successfully!');
+      setMessage(t('themeSuccess'));
+      setIsSuccess(true);
+
+      // Clear success message after 2 seconds
+      setTimeout(() => setMessage(''), 2000);
     } catch {
-      setMessage('Failed to update theme. Please try again.');
+      setMessage(t('themeError'));
+      setIsSuccess(false);
     } finally {
       setIsLoading(false);
     }
@@ -46,7 +54,7 @@ export default function ThemeToggle({}: ThemeToggleProps) {
   return (
     <div>
       <p className="text-sm text-muted mb-4">
-        Choose your preferred theme
+        {t('themePreferredLabel')}
       </p>
 
       <div className="flex items-center gap-4">
@@ -85,7 +93,7 @@ export default function ThemeToggle({}: ThemeToggleProps) {
       </div>
 
       {message && (
-        <p className={`mt-4 text-sm ${message.includes('success') ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <p className={`mt-4 text-sm ${isSuccess ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
           {message}
         </p>
       )}

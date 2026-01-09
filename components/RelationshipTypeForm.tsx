@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { useTranslations } from 'next-intl';
 import RelationshipTypeAutocomplete from './RelationshipTypeAutocomplete';
 import { Button } from './ui/Button';
 
@@ -41,6 +42,7 @@ export default function RelationshipTypeForm({
   availableTypes,
   mode,
 }: RelationshipTypeFormProps) {
+  const t = useTranslations('relationshipTypes.form');
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -125,21 +127,21 @@ export default function RelationshipTypeForm({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Something went wrong');
+        setError(data.error || t('errorSomethingWrong'));
         return;
       }
 
       // Show success toast
       toast.success(
         mode === 'create'
-          ? `Relationship type "${formData.label}" has been created`
-          : `Relationship type "${formData.label}" has been updated`
+          ? t('successCreated', { label: formData.label })
+          : t('successUpdated', { label: formData.label })
       );
 
       router.push('/relationship-types');
       router.refresh();
     } catch {
-      setError('Unable to connect to server. Please check your connection and try again.');
+      setError(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +160,7 @@ export default function RelationshipTypeForm({
           htmlFor="label"
           className="block text-sm font-medium text-muted mb-1"
         >
-          Relationship Label *
+          {t('labelRequired')}
         </label>
         <input
           type="text"
@@ -167,16 +169,16 @@ export default function RelationshipTypeForm({
           value={formData.label}
           onChange={(e) => setFormData({ ...formData, label: e.target.value })}
           className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="e.g., Mentor, Student, Neighbor"
+          placeholder={t('labelPlaceholder')}
         />
         <p className="text-xs text-muted mt-1">
-          The name that will be displayed to users
+          {t('labelHelp')}
         </p>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-muted mb-2">
-          Inverse Relationship
+          {t('inverseRelationship')}
         </label>
 
         {/* Symmetric toggle */}
@@ -205,13 +207,11 @@ export default function RelationshipTypeForm({
             />
           </button>
           <span className="ml-3 text-sm text-muted">
-            Symmetric (same as inverse)
+            {t('symmetric')}
           </span>
         </div>
         <p className="text-xs text-muted mb-3">
-          {isSymmetric
-            ? `Both directions will use the same label (e.g., Friend ↔ Friend)`
-            : 'The reciprocal relationship (e.g., Parent ↔ Child, Mentor ↔ Student)'}
+          {isSymmetric ? t('symmetricHelp') : t('nonSymmetricHelp')}
         </p>
 
         {/* Inverse autocomplete - only shown when not symmetric */}
@@ -225,14 +225,14 @@ export default function RelationshipTypeForm({
               setInverseIsExisting(isExisting);
               setInverseLabel(label);
             }}
-            placeholder="Search existing or type to create new..."
+            placeholder={t('inversePlaceholder')}
           />
         )}
       </div>
 
       <div>
         <label className="block text-sm font-medium text-muted mb-2">
-          Color
+          {t('color')}
         </label>
         <div className="flex flex-wrap gap-3">
           {PRESET_COLORS.map((color) => (
@@ -255,7 +255,7 @@ export default function RelationshipTypeForm({
             htmlFor="customColor"
             className="block text-xs text-muted mb-1"
           >
-            Or choose a custom color:
+            {t('customColor')}
           </label>
           <input
             type="color"
@@ -269,14 +269,14 @@ export default function RelationshipTypeForm({
 
       <div className="flex justify-end space-x-4 pt-4">
         <Button variant="secondary" href="/relationship-types">
-          Cancel
+          {t('cancel')}
         </Button>
         <Button type="submit" disabled={isLoading}>
           {isLoading
-            ? 'Saving...'
+            ? t('saving')
             : mode === 'create'
-            ? 'Create Type'
-            : 'Update Type'}
+            ? t('createType')
+            : t('updateType')}
         </Button>
       </div>
     </form>

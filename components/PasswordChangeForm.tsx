@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { PasswordStrengthIndicator } from '@/components/PasswordStrengthIndicator';
 
 interface PasswordChangeFormProps {
@@ -8,6 +9,7 @@ interface PasswordChangeFormProps {
 }
 
 export default function PasswordChangeForm({}: PasswordChangeFormProps) {
+  const t = useTranslations('settings.security');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [validationErrors, setValidationErrors] = useState<Array<{ field: string; message: string }>>([]);
@@ -27,29 +29,29 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
 
     // Validate passwords match
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('New passwords do not match');
+      setError(t('passwordsNoMatch'));
       return;
     }
 
     // Client-side password validation (matches backend requirements)
     if (formData.newPassword.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t('passwordTooShort'));
       return;
     }
     if (!/[A-Z]/.test(formData.newPassword)) {
-      setError('Password must contain at least one uppercase letter');
+      setError(t('passwordNeedsUppercase'));
       return;
     }
     if (!/[a-z]/.test(formData.newPassword)) {
-      setError('Password must contain at least one lowercase letter');
+      setError(t('passwordNeedsLowercase'));
       return;
     }
     if (!/[0-9]/.test(formData.newPassword)) {
-      setError('Password must contain at least one number');
+      setError(t('passwordNeedsNumber'));
       return;
     }
     if (!/[^A-Za-z0-9]/.test(formData.newPassword)) {
-      setError('Password must contain at least one special character (!@#$%^&*)');
+      setError(t('passwordNeedsSpecial'));
       return;
     }
 
@@ -73,14 +75,14 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
         // Check if there are detailed validation errors
         if (data.details && Array.isArray(data.details)) {
           setValidationErrors(data.details);
-          setError(data.error || 'Please fix the errors below');
+          setError(data.error || t('errorValidation'));
         } else {
-          setError(data.error || 'Failed to change password');
+          setError(data.error || t('errorUpdate'));
         }
         return;
       }
 
-      setSuccess('Password changed successfully');
+      setSuccess(t('successUpdate'));
       setFormData({
         currentPassword: '',
         newPassword: '',
@@ -90,7 +92,7 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000);
     } catch {
-      setError('Unable to connect to server. Please check your connection and try again.');
+      setError(t('errorConnection'));
     } finally {
       setIsLoading(false);
     }
@@ -124,7 +126,7 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
           htmlFor="currentPassword"
           className="block text-sm font-medium text-muted mb-1"
         >
-          Current Password
+          {t('currentPassword')}
         </label>
         <input
           type="password"
@@ -141,7 +143,7 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
           htmlFor="newPassword"
           className="block text-sm font-medium text-muted mb-1"
         >
-          New Password
+          {t('newPassword')}
         </label>
         <input
           type="password"
@@ -159,7 +161,7 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
           htmlFor="confirmPassword"
           className="block text-sm font-medium text-muted mb-1"
         >
-          Confirm New Password
+          {t('confirmPassword')}
         </label>
         <input
           type="password"
@@ -177,7 +179,7 @@ export default function PasswordChangeForm({}: PasswordChangeFormProps) {
           disabled={isLoading}
           className="px-6 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark shadow-lg hover:shadow-primary/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Changing Password...' : 'Change Password'}
+          {isLoading ? t('updating') : t('updatePassword')}
         </button>
       </div>
     </form>

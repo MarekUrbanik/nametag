@@ -1,7 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { NextIntlClientProvider } from 'next-intl';
 import GroupsSelector from '../../components/GroupsSelector';
+import enMessages from '../../locales/en.json';
 
 // Mock sonner toast
 vi.mock('sonner', () => ({
@@ -12,6 +14,15 @@ vi.mock('sonner', () => ({
 }));
 
 import { toast } from 'sonner';
+
+// Wrapper component for tests
+function Wrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <NextIntlClientProvider locale="en" messages={enMessages}>
+      {children}
+    </NextIntlClientProvider>
+  );
+}
 
 describe('GroupsSelector', () => {
   const mockGroups = [
@@ -29,12 +40,12 @@ describe('GroupsSelector', () => {
 
   describe('Basic functionality', () => {
     it('should render with placeholder text', () => {
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
-        />
+        /></Wrapper>
       );
 
       expect(screen.getByPlaceholderText(/search or create groups/i)).toBeInTheDocument();
@@ -43,12 +54,12 @@ describe('GroupsSelector', () => {
     it('should show available groups when focused', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search or create groups/i);
@@ -62,12 +73,12 @@ describe('GroupsSelector', () => {
     it('should filter groups based on search term', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search or create groups/i);
@@ -81,12 +92,12 @@ describe('GroupsSelector', () => {
     it('should add group when clicking on suggestion', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search or create groups/i);
@@ -99,12 +110,12 @@ describe('GroupsSelector', () => {
     it('should remove group when clicking X on pill', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={['group-1']}
           onChange={mockOnChange}
-        />
+        /></Wrapper>
       );
 
       const removeButton = screen.getByLabelText('Remove Family');
@@ -118,13 +129,13 @@ describe('GroupsSelector', () => {
     it('should show "Create group" option when typing a new group name', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -137,13 +148,13 @@ describe('GroupsSelector', () => {
     it('should not show "Create group" option when search matches existing group exactly', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -157,13 +168,13 @@ describe('GroupsSelector', () => {
     it('should not show "Create group" option when allowCreate is false', async () => {
       const user = userEvent.setup();
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={false}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -181,13 +192,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ group: newGroup }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -212,13 +223,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ group: newGroup }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -239,13 +250,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ group: newGroup }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -265,13 +276,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ error: 'A group with this name already exists' }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -292,13 +303,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ group: newGroup }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -322,13 +333,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ group: newGroup }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i);
@@ -350,13 +361,13 @@ describe('GroupsSelector', () => {
         json: () => Promise.resolve({ group: newGroup }),
       });
 
-      render(
+      render(<Wrapper>
         <GroupsSelector
           availableGroups={mockGroups}
           selectedGroupIds={[]}
           onChange={mockOnChange}
           allowCreate={true}
-        />
+        /></Wrapper>
       );
 
       const input = screen.getByPlaceholderText(/search/i) as HTMLInputElement;

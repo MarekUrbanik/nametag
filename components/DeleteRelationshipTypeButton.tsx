@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Button } from './ui/Button';
 
 interface DeleteRelationshipTypeButtonProps {
@@ -15,6 +16,7 @@ export default function DeleteRelationshipTypeButton({
   relationshipTypeName,
   usageCount,
 }: DeleteRelationshipTypeButtonProps) {
+  const t = useTranslations('relationshipTypes.delete');
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -32,7 +34,7 @@ export default function DeleteRelationshipTypeButton({
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to delete relationship type');
+        setError(data.error || t('errorDelete'));
         setIsDeleting(false);
         return;
       }
@@ -40,26 +42,30 @@ export default function DeleteRelationshipTypeButton({
       // Refresh the page to show updated list
       router.refresh();
     } catch {
-      setError('Failed to delete relationship type');
+      setError(t('errorDelete'));
       setIsDeleting(false);
     }
   };
 
   if (showConfirm) {
+    const usedText = usageCount > 0
+      ? ` (${usageCount === 1 ? t('usedCount', { count: usageCount }) : t('usedCount_plural', { count: usageCount })})`
+      : '';
+
     return (
       <div className="flex items-center gap-2">
         <span className="text-xs text-muted">
-          Delete <span className="font-medium">{relationshipTypeName}</span>
-          {usageCount > 0 ? ` (used ${usageCount} time${usageCount === 1 ? '' : 's'})` : ''}?
+          {t('confirmPrompt')} <span className="font-medium">{relationshipTypeName}</span>
+          {usedText}?
         </span>
         <Button
           size="sm"
           variant="danger"
           onClick={handleDelete}
           disabled={isDeleting}
-          title="Confirm delete"
+          title={t('confirmTitle')}
         >
-          {isDeleting ? 'Deleting...' : 'Confirm'}
+          {isDeleting ? t('deleting') : t('confirmButton')}
         </Button>
         <Button
           size="sm"
@@ -69,9 +75,9 @@ export default function DeleteRelationshipTypeButton({
             setError('');
           }}
           disabled={isDeleting}
-          title="Cancel"
+          title={t('cancelTitle')}
         >
-          Cancel
+          {t('cancel')}
         </Button>
         {error && (
           <span className="text-xs text-red-600 dark:text-red-400">{error}</span>
@@ -84,7 +90,7 @@ export default function DeleteRelationshipTypeButton({
     <button
       onClick={() => setShowConfirm(true)}
       className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
-      title="Delete"
+      title={t('button')}
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path

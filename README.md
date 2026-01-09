@@ -56,6 +56,7 @@ Nametag solves this by giving you a single place to manage your personal network
 - Organize contacts into custom groups
 - Set reminders for important dates and staying in touch
 - Full dark mode support
+- Multiple languages (English and Spanish)
 - Mobile-responsive design
 
 ## Hosted vs Self-Hosted

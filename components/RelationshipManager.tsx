@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import PersonAutocomplete from './PersonAutocomplete';
 import { formatFullName } from '@/lib/nameUtils';
@@ -56,6 +57,8 @@ export default function RelationshipManager({
   currentUser,
   hasUserRelationship = false,
 }: RelationshipManagerProps) {
+  const t = useTranslations('people');
+  const tCommon = useTranslations('common');
   const router = useRouter();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -244,19 +247,19 @@ export default function RelationshipManager({
     <div>
       <div className="flex justify-between items-center mb-3">
         <h4 className="text-base font-medium text-muted">
-          Other Relationships
+          {t('otherRelationships')}
         </h4>
         <button
           onClick={() => setShowAddModal(true)}
           className="px-3 py-1 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary-dark transition-colors shadow-lg hover:shadow-primary/50"
         >
-          Add Relationship
+          {t('addRelationship')}
         </button>
       </div>
 
       {relationships.length === 0 ? (
         <p className="text-muted text-sm">
-          No relationships yet.
+          {t('noRelationshipsYet')}
         </p>
       ) : (
         <div className="space-y-2">
@@ -296,7 +299,7 @@ export default function RelationshipManager({
                 <button
                   onClick={() => openEditModal(rel)}
                   className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-                  title="Edit"
+                  title={t('edit')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -305,7 +308,7 @@ export default function RelationshipManager({
                 <button
                   onClick={() => openDeleteModal(rel)}
                   className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 transition-colors"
-                  title="Delete"
+                  title={t('delete')}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -322,7 +325,7 @@ export default function RelationshipManager({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Add Relationship
+              {t('addRelationship')}
             </h3>
             <form onSubmit={handleAdd} className="space-y-4">
               {error && (
@@ -332,7 +335,7 @@ export default function RelationshipManager({
               )}
               <div>
                 <label className="block text-sm font-medium text-muted mb-1">
-                  Relationship Type *
+                  {t('relationshipType')} *
                 </label>
                 <select
                   required
@@ -351,7 +354,7 @@ export default function RelationshipManager({
               </div>
               <div>
                 <label className="block text-sm font-medium text-muted mb-1">
-                  Person *
+                  {t('person')} *
                 </label>
                 <PersonAutocomplete
                   people={peopleWithUser}
@@ -359,7 +362,7 @@ export default function RelationshipManager({
                   onChange={(personId) =>
                     setFormData({ ...formData, relatedPersonId: personId })
                   }
-                  placeholder="Search for a person..."
+                  placeholder={t('searchForPerson')}
                   required
                   onCreateNew={handleCreateNewPerson}
                   highlightPersonId={currentUser?.id}
@@ -367,7 +370,7 @@ export default function RelationshipManager({
               </div>
               <div>
                 <label className="block text-sm font-medium text-muted mb-1">
-                  Notes
+                  {t('notes')}
                 </label>
                 <textarea
                   rows={2}
@@ -376,7 +379,7 @@ export default function RelationshipManager({
                     setFormData({ ...formData, notes: e.target.value })
                   }
                   className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Optional notes..."
+                  placeholder={t('optionalNotes')}
                 />
               </div>
               <div className="flex justify-end space-x-3 pt-2">
@@ -385,13 +388,13 @@ export default function RelationshipManager({
                   variant="secondary"
                   onClick={() => setShowAddModal(false)}
                 >
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Adding...' : 'Add Relationship'}
+                  {isLoading ? t('adding') : t('addRelationship')}
                 </Button>
               </div>
             </form>
@@ -404,7 +407,7 @@ export default function RelationshipManager({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Edit Relationship with {formatFullName(selectedRelationship.relatedPerson)}
+              {t('editRelationship', { name: formatFullName(selectedRelationship.relatedPerson) })}
             </h3>
             <form onSubmit={handleEdit} className="space-y-4">
               {error && (
@@ -414,7 +417,7 @@ export default function RelationshipManager({
               )}
               <div>
                 <label className="block text-sm font-medium text-muted mb-1">
-                  Relationship Type *
+                  {t('relationshipType')} *
                 </label>
                 <select
                   required
@@ -433,7 +436,7 @@ export default function RelationshipManager({
               </div>
               <div>
                 <label className="block text-sm font-medium text-muted mb-1">
-                  Notes
+                  {t('notes')}
                 </label>
                 <textarea
                   rows={2}
@@ -442,7 +445,7 @@ export default function RelationshipManager({
                     setFormData({ ...formData, notes: e.target.value })
                   }
                   className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Optional notes..."
+                  placeholder={t('optionalNotes')}
                 />
               </div>
               <div className="flex justify-end space-x-3 pt-2">
@@ -451,13 +454,13 @@ export default function RelationshipManager({
                   variant="secondary"
                   onClick={() => setShowEditModal(false)}
                 >
-                  Cancel
+                  {tCommon('cancel')}
                 </Button>
                 <Button
                   type="submit"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Saving...' : 'Save Changes'}
+                  {isLoading ? t('saving') : t('saveChanges')}
                 </Button>
               </div>
             </form>
@@ -470,14 +473,10 @@ export default function RelationshipManager({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-surface rounded-lg max-w-md w-full p-6">
             <h3 className="text-lg font-semibold text-foreground mb-2">
-              Delete Relationship
+              {t('deleteRelationship')}
             </h3>
             <p className="text-muted mb-6">
-              Are you sure you want to delete the relationship with{' '}
-              <strong className="text-foreground">
-                {formatFullName(selectedRelationship.relatedPerson)}
-              </strong>
-              ? This will also remove the reverse relationship.
+              {t('deleteRelationshipConfirm', { name: formatFullName(selectedRelationship.relatedPerson) })}
             </p>
 
             {error && (
@@ -492,14 +491,14 @@ export default function RelationshipManager({
                 onClick={() => setShowDeleteModal(false)}
                 disabled={isLoading}
               >
-                Cancel
+                {tCommon('cancel')}
               </Button>
               <Button
                 variant="danger"
                 onClick={handleDelete}
                 disabled={isLoading}
               >
-                {isLoading ? 'Deleting...' : 'Delete'}
+                {isLoading ? t('deleting') : t('delete')}
               </Button>
             </div>
           </div>
