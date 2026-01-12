@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { formatFullName } from '@/lib/nameUtils';
+import { formatGraphName } from '@/lib/nameUtils';
 import { apiResponse, handleApiError, withAuth } from '@/lib/api-utils';
 
 type DashboardGraphPerson = {
@@ -161,7 +161,7 @@ export const GET = withAuth(async (request, session) => {
     people.forEach((person) => {
       nodes.push({
         id: person.id,
-        label: formatFullName(person),
+        label: formatGraphName(person),
         groups: person.groups.map((pg) => pg.group.name),
         colors: person.groups.map((pg) => pg.group.color || '#3B82F6'),
         isCenter: false,

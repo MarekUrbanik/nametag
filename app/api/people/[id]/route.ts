@@ -54,6 +54,8 @@ export const PUT = withAuth(async (request, session, context) => {
     const {
       name,
       surname,
+      middleName,
+      secondLastName,
       nickname,
       lastContact,
       notes,
@@ -112,6 +114,8 @@ export const PUT = withAuth(async (request, session, context) => {
     // Sanitize user inputs to prevent XSS attacks
     const sanitizedName = sanitizeName(name) || name;
     const sanitizedSurname = surname ? sanitizeName(surname) : null;
+    const sanitizedMiddleName = middleName ? sanitizeName(middleName) : null;
+    const sanitizedSecondLastName = secondLastName ? sanitizeName(secondLastName) : null;
     const sanitizedNickname = nickname ? sanitizeName(nickname) : null;
     const sanitizedNotes = notes ? sanitizeNotes(notes) : null;
 
@@ -119,6 +123,8 @@ export const PUT = withAuth(async (request, session, context) => {
     const updateData = {
       name: sanitizedName,
       surname: sanitizedSurname,
+      middleName: sanitizedMiddleName,
+      secondLastName: sanitizedSecondLastName,
       nickname: sanitizedNickname,
       lastContact: lastContact ? new Date(lastContact) : null,
       notes: sanitizedNotes,

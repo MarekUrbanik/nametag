@@ -53,6 +53,8 @@ export default async function NewPersonPage({
         id: true,
         name: true,
         surname: true,
+        middleName: true,
+        secondLastName: true,
         nickname: true,
         groups: {
           select: {

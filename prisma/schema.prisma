@@ -52,6 +52,8 @@ model Person {
   userId                      String
   name                        String
   surname                     String?
+  middleName                  String?
+  secondLastName              String?
   nickname                    String?
   lastContact                 DateTime?
   notes                       String?               @db.Text
@@ -77,6 +79,8 @@ model Person {
   @@index([userId, lastContact]) // For recent contacts query
   @@index([userId, name]) // For name sorting/search
   @@index([userId, surname]) // For surname sorting/search
+  @@index([userId, middleName]) // For middle name sorting/search
+  @@index([userId, secondLastName]) // For second last name sorting/search
   @@index([userId, nickname]) // For nickname sorting/search
   @@index([contactReminderEnabled, lastContact]) // For contact reminder queries
   @@index([userId, deletedAt]) // For soft delete filtering

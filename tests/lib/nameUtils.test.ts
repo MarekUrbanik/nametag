@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { formatPersonName, formatFullName } from '@/lib/nameUtils';
+import { formatPersonName, formatFullName, formatGraphName } from '@/lib/nameUtils';
 
 describe('nameUtils', () => {
   describe('formatPersonName', () => {
@@ -12,11 +12,11 @@ describe('nameUtils', () => {
     });
 
     it('should format name with nickname', () => {
-      expect(formatPersonName('Charles', null, 'Charlie')).toBe("Charles 'Charlie'");
+      expect(formatPersonName('Charles', null, null, null, 'Charlie')).toBe("Charles 'Charlie'");
     });
 
     it('should format name, nickname, and surname', () => {
-      expect(formatPersonName('Charles', 'Brown', 'Charlie')).toBe("Charles 'Charlie' Brown");
+      expect(formatPersonName('Charles', 'Brown', null, null, 'Charlie')).toBe("Charles 'Charlie' Brown");
     });
 
     it('should handle null surname', () => {
@@ -28,11 +28,11 @@ describe('nameUtils', () => {
     });
 
     it('should handle null nickname', () => {
-      expect(formatPersonName('John', 'Smith', null)).toBe('John Smith');
+      expect(formatPersonName('John', 'Smith', null, null, null)).toBe('John Smith');
     });
 
     it('should handle undefined nickname', () => {
-      expect(formatPersonName('John', 'Smith', undefined)).toBe('John Smith');
+      expect(formatPersonName('John', 'Smith', undefined, undefined, undefined)).toBe('John Smith');
     });
 
     it('should handle all null/undefined optional params', () => {
@@ -41,11 +41,35 @@ describe('nameUtils', () => {
     });
 
     it('should handle names with special characters', () => {
-      expect(formatPersonName("Mary-Jane", "O'Connor", "MJ")).toBe("Mary-Jane 'MJ' O'Connor");
+      expect(formatPersonName("Mary-Jane", "O'Connor", null, null, "MJ")).toBe("Mary-Jane 'MJ' O'Connor");
     });
 
     it('should handle unicode names', () => {
-      expect(formatPersonName('José', 'García', 'Pepe')).toBe("José 'Pepe' García");
+      expect(formatPersonName('José', 'García', null, null, 'Pepe')).toBe("José 'Pepe' García");
+    });
+
+    it('should format name with middle name', () => {
+      expect(formatPersonName('John', 'Doe', 'Michael')).toBe('John Michael Doe');
+    });
+
+    it('should format name with second last name', () => {
+      expect(formatPersonName('Jane', 'Smith', null, 'Johnson')).toBe('Jane Smith Johnson');
+    });
+
+    it('should format name with middle name and second last name', () => {
+      expect(formatPersonName('Matias', 'Godoy', 'Alejandro', 'Biedma')).toBe('Matias Alejandro Godoy Biedma');
+    });
+
+    it('should format complete name with nickname, middle name, and second last name', () => {
+      expect(formatPersonName('Matias', 'Godoy', 'Alejandro', 'Biedma', 'Matto')).toBe("Matias 'Matto' Alejandro Godoy Biedma");
+    });
+
+    it('should handle null middle name and second last name', () => {
+      expect(formatPersonName('John', 'Doe', null, null)).toBe('John Doe');
+    });
+
+    it('should handle undefined middle name and second last name', () => {
+      expect(formatPersonName('John', 'Doe', undefined, undefined)).toBe('John Doe');
     });
   });
 
@@ -73,6 +97,75 @@ describe('nameUtils', () => {
     it('should handle null values in person object', () => {
       const person = { name: 'John', surname: null, nickname: null };
       expect(formatFullName(person)).toBe('John');
+    });
+
+    it('should format person with middle name', () => {
+      const person = { name: 'John', surname: 'Doe', middleName: 'Michael' };
+      expect(formatFullName(person)).toBe('John Michael Doe');
+    });
+
+    it('should format person with second last name', () => {
+      const person = { name: 'Jane', surname: 'Smith', secondLastName: 'Johnson' };
+      expect(formatFullName(person)).toBe('Jane Smith Johnson');
+    });
+
+    it('should format person with all name fields', () => {
+      const person = {
+        name: 'Matias',
+        surname: 'Godoy',
+        middleName: 'Alejandro',
+        secondLastName: 'Biedma',
+        nickname: 'Matto'
+      };
+      expect(formatFullName(person)).toBe("Matias 'Matto' Alejandro Godoy Biedma");
+    });
+  });
+
+  describe('formatGraphName', () => {
+    it('should format name only', () => {
+      const person = { name: 'John' };
+      expect(formatGraphName(person)).toBe('John');
+    });
+
+    it('should format name and surname', () => {
+      const person = { name: 'John', surname: 'Doe' };
+      expect(formatGraphName(person)).toBe('John Doe');
+    });
+
+    it('should use nickname instead of name when present', () => {
+      const person = { name: 'Matias', surname: 'Godoy', nickname: 'Matto' };
+      expect(formatGraphName(person)).toBe('Matto Godoy');
+    });
+
+    it('should show only first name and surname (ignore middle names)', () => {
+      const person = {
+        name: 'Matias',
+        surname: 'Godoy',
+        middleName: 'Alejandro',
+        secondLastName: 'Biedma',
+      };
+      expect(formatGraphName(person)).toBe('Matias Godoy');
+    });
+
+    it('should use nickname with surname (ignore middle names)', () => {
+      const person = {
+        name: 'Matias',
+        surname: 'Godoy',
+        middleName: 'Alejandro',
+        secondLastName: 'Biedma',
+        nickname: 'Matto',
+      };
+      expect(formatGraphName(person)).toBe('Matto Godoy');
+    });
+
+    it('should handle null surname', () => {
+      const person = { name: 'John', surname: null };
+      expect(formatGraphName(person)).toBe('John');
+    });
+
+    it('should handle nickname without surname', () => {
+      const person = { name: 'John', surname: null, nickname: 'Johnny' };
+      expect(formatGraphName(person)).toBe('Johnny');
     });
   });
 });

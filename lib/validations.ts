@@ -71,6 +71,8 @@ const importantDateSchema = z.object({
 export const createPersonSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   surname: z.string().max(100).nullable().optional(),
+  middleName: z.string().max(100).nullable().optional(),
+  secondLastName: z.string().max(100).nullable().optional(),
   nickname: z.string().max(100).nullable().optional(),
   lastContact: z.string().refine((val) => !val || !isNaN(Date.parse(val)), 'Invalid date').nullable().optional(),
   notes: z.string().max(10000).nullable().optional(),
@@ -183,6 +185,8 @@ export const importDataSchema = z.object({
     id: z.string(),
     name: z.string(),
     surname: z.string().nullable().optional(),
+    middleName: z.string().nullable().optional(),
+    secondLastName: z.string().nullable().optional(),
     nickname: z.string().nullable().optional(),
     lastContact: z.string().nullable().optional(),
     notes: z.string().nullable().optional(),

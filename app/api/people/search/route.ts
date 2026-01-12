@@ -27,6 +27,18 @@ export const GET = withAuth(async (request, session) => {
           },
         },
         {
+          middleName: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        {
+          secondLastName: {
+            contains: query,
+            mode: 'insensitive',
+          },
+        },
+        {
           nickname: {
             contains: query,
             mode: 'insensitive',
@@ -38,6 +50,8 @@ export const GET = withAuth(async (request, session) => {
       id: true,
       name: true,
       surname: true,
+      middleName: true,
+      secondLastName: true,
       nickname: true,
     },
     orderBy: {

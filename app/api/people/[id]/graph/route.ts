@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma';
-import { formatFullName } from '@/lib/nameUtils';
+import { formatGraphName } from '@/lib/nameUtils';
 import { apiResponse, handleApiError, withAuth } from '@/lib/api-utils';
 
 interface GraphNode {
@@ -122,7 +122,7 @@ export const GET = withAuth(async (_request, session, context) => {
     // Add center node (the person we're viewing)
     nodes.push({
       id: person.id,
-      label: formatFullName(person),
+      label: formatGraphName(person),
       groups: person.groups.map((pg) => pg.group.name),
       colors: person.groups.map((pg) => pg.group.color || '#3B82F6'),
       isCenter: true,
@@ -155,7 +155,7 @@ export const GET = withAuth(async (_request, session, context) => {
       if (!nodeIds.has(rel.relatedPersonId)) {
         nodes.push({
           id: rel.relatedPersonId,
-          label: formatFullName(rel.relatedPerson),
+          label: formatGraphName(rel.relatedPerson),
           groups: rel.relatedPerson.groups.map((pg) => pg.group.name),
           colors: rel.relatedPerson.groups.map((pg) => pg.group.color || '#3B82F6'),
           isCenter: false,

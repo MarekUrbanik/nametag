@@ -31,6 +31,8 @@ interface PersonFormProps {
     id: string;
     name: string;
     surname: string | null;
+    middleName: string | null;
+    secondLastName: string | null;
     nickname: string | null;
     lastContact: Date | null;
     notes: string | null;
@@ -66,6 +68,8 @@ interface PersonFormProps {
     id: string;
     name: string;
     surname: string | null;
+    middleName: string | null;
+    secondLastName: string | null;
     nickname: string | null;
     groups: Array<{ groupId: string }>;
   }>;
@@ -115,6 +119,8 @@ export default function PersonForm({
   const [formData, setFormData] = useState({
     name: person?.name || initialName || '',
     surname: person?.surname || '',
+    middleName: person?.middleName || '',
+    secondLastName: person?.secondLastName || '',
     nickname: person?.nickname || '',
     lastContact: person?.lastContact
       ? new Date(person.lastContact).toISOString().split('T')[0]
@@ -286,7 +292,7 @@ export default function PersonForm({
       <Section>
         <SectionHeader>{t('sectionDetails')}</SectionHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label
                 htmlFor="name"
@@ -301,6 +307,24 @@ export default function PersonForm({
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="middleName"
+                className="block text-sm font-medium text-muted mb-1"
+              >
+                {t('middleNameLabel')}
+              </label>
+              <input
+                type="text"
+                id="middleName"
+                value={formData.middleName}
+                onChange={(e) =>
+                  setFormData({ ...formData, middleName: e.target.value })
                 }
                 className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
@@ -325,6 +349,24 @@ export default function PersonForm({
             </div>
 
             <div>
+              <label
+                htmlFor="secondLastName"
+                className="block text-sm font-medium text-muted mb-1"
+              >
+                {t('secondLastNameLabel')}
+              </label>
+              <input
+                type="text"
+                id="secondLastName"
+                value={formData.secondLastName}
+                onChange={(e) =>
+                  setFormData({ ...formData, secondLastName: e.target.value })
+                }
+                className="w-full px-3 py-2 border border-border rounded-lg bg-surface text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+
+            <div className="md:col-span-2">
               <label
                 htmlFor="nickname"
                 className="block text-sm font-medium text-muted mb-1"

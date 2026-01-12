@@ -423,4 +423,164 @@ describe('People API', () => {
       );
     });
   });
+
+  describe('New name fields (middleName, secondLastName)', () => {
+    it('should create a person with middle name and second last name', async () => {
+      const newPerson = {
+        id: 'person-new',
+        name: 'Matias',
+        surname: 'Godoy',
+        middleName: 'Alejandro',
+        secondLastName: 'Biedma',
+        groups: [],
+      };
+
+      mocks.personCreate.mockResolvedValue(newPerson);
+
+      const request = new Request('http://localhost/api/people', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Matias',
+          surname: 'Godoy',
+          middleName: 'Alejandro',
+          secondLastName: 'Biedma',
+          relationshipToUserId: 'rel-type-1',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+      const body = await response.json();
+
+      expect(response.status).toBe(201);
+      expect(body.person).toEqual(newPerson);
+      expect(mocks.personCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            middleName: 'Alejandro',
+            secondLastName: 'Biedma',
+          }),
+        })
+      );
+    });
+
+    it('should create a person with only middle name', async () => {
+      const newPerson = {
+        id: 'person-new',
+        name: 'John',
+        surname: 'Doe',
+        middleName: 'Michael',
+        secondLastName: null,
+        groups: [],
+      };
+
+      mocks.personCreate.mockResolvedValue(newPerson);
+
+      const request = new Request('http://localhost/api/people', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'John',
+          surname: 'Doe',
+          middleName: 'Michael',
+          relationshipToUserId: 'rel-type-1',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.personCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            middleName: 'Michael',
+          }),
+        })
+      );
+    });
+
+    it('should create a person with only second last name', async () => {
+      const newPerson = {
+        id: 'person-new',
+        name: 'Jane',
+        surname: 'Smith',
+        middleName: null,
+        secondLastName: 'Johnson',
+        groups: [],
+      };
+
+      mocks.personCreate.mockResolvedValue(newPerson);
+
+      const request = new Request('http://localhost/api/people', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Jane',
+          surname: 'Smith',
+          secondLastName: 'Johnson',
+          relationshipToUserId: 'rel-type-1',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+
+      const response = await POST(request);
+
+      expect(response.status).toBe(201);
+      expect(mocks.personCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            secondLastName: 'Johnson',
+          }),
+        })
+      );
+    });
+
+    it('should update a person with middle name and second last name', async () => {
+      const existingPerson = {
+        id: 'person-1',
+        name: 'John',
+        surname: 'Doe',
+        middleName: null,
+        secondLastName: null,
+        userId: 'user-123',
+        contactReminderEnabled: false
+      };
+      const updatedPerson = {
+        id: 'person-1',
+        name: 'John',
+        surname: 'Doe',
+        middleName: 'Michael',
+        secondLastName: 'Johnson',
+        groups: []
+      };
+
+      mocks.personFindUnique.mockResolvedValue(existingPerson);
+      mocks.importantDateCount.mockResolvedValue(0);
+      mocks.personUpdate.mockResolvedValue(updatedPerson);
+
+      const request = new Request('http://localhost/api/people/person-1', {
+        method: 'PUT',
+        body: JSON.stringify({
+          name: 'John',
+          surname: 'Doe',
+          middleName: 'Michael',
+          secondLastName: 'Johnson',
+        }),
+        headers: { 'content-type': 'application/json' },
+      });
+      const context = { params: Promise.resolve({ id: 'person-1' }) };
+      const response = await PUT(request, context);
+      const body = await response.json();
+
+      expect(response.status).toBe(200);
+      expect(body.person).toEqual(updatedPerson);
+      expect(mocks.personUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            middleName: 'Michael',
+            secondLastName: 'Johnson',
+          }),
+        })
+      );
+    });
+  });
 });

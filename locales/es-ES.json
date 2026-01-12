@@ -416,6 +416,8 @@
       "nameLabel": "Nombre",
       "nameRequired": "Nombre *",
       "surnameLabel": "Apellido",
+      "middleNameLabel": "Segundo Nombre",
+      "secondLastNameLabel": "Segundo Apellido",
       "nicknameLabel": "Apodo",
       "knownThroughLabel": "Conocido a través de",
       "knownThroughHelp": "Selecciona quién te conecta con esta persona. Por ejemplo, si añades al hijo de tu amigo, selecciona a tu amigo.",
