@@ -6,19 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.12.3](https://github.com/mattogodoy/nametag/compare/v0.12.2...v0.12.3) (2026-01-14)
+## [0.13.0](https://github.com/mattogodoy/nametag/compare/v0.12.3...v0.13.0) (2026-01-14)
 
-### Bug Fixes
+### Features
 
-* Some buttons were getting stuck in a disabled state ([6369811](https://github.com/mattogodoy/nametag/commit/6369811f3d61a6402b45b416630224be709353ac))
+* Added option to disable registration ([eb5c9d2](https://github.com/mattogodoy/nametag/commit/eb5c9d223f60ffcba3f186453637b2526f088e1f))
 
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v0.13.0](https://github.com/mattogodoy/nametag/compare/v0.12.3...v0.13.0)
+
+- Add option to disable registration [`#17`](https://github.com/mattogodoy/nametag/pull/17)
+- ✨ Feature: Added option to disable registration [`eb5c9d2`](https://github.com/mattogodoy/nametag/commit/eb5c9d223f60ffcba3f186453637b2526f088e1f)
+
 #### [v0.12.3](https://github.com/mattogodoy/nametag/compare/v0.12.2...v0.12.3)
 
+> 14 January 2026
+
 - Fix typo [`#5`](https://github.com/mattogodoy/nametag/pull/5)
+- 🔧 Chore: release v0.12.3 [`aeaa93a`](https://github.com/mattogodoy/nametag/commit/aeaa93afa75d9c7d7d71c9ceba70ea0a6df58043)
 - 🐛 Fix: Some buttons were getting stuck in a disabled state [`6369811`](https://github.com/mattogodoy/nametag/commit/6369811f3d61a6402b45b416630224be709353ac)
 
 #### [v0.12.2](https://github.com/mattogodoy/nametag/compare/v0.12.1...v0.12.2)
