@@ -11,7 +11,9 @@ COPY package*.json ./
 COPY prisma ./prisma/
 
 # Install ALL dependencies (including devDependencies needed for build)
-RUN npm ci
+# Use cache mount to speed up npm install across builds
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -67,7 +69,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Install Prisma CLI for migrations (as root before switching users)
 # Note: We only install prisma (not @prisma/client which is already in standalone)
-RUN npm install prisma@7.0.1
+RUN --mount=type=cache,target=/root/.npm \
+    npm install prisma@7.0.1
 
 # Copy Prisma generated client from builder (already built)
 COPY --from=builder /app/node_modules/.prisma/ ./node_modules/.prisma/
