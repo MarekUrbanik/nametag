@@ -58,6 +58,7 @@ Nametag solves this by giving you a single place to manage your personal network
 - Full dark mode support
 - Multiple languages (English and Spanish)
 - Mobile-responsive design
+- Multi-platform Docker support (AMD64 and ARM64)
 
 ## Hosted vs Self-Hosted
 
@@ -72,6 +73,8 @@ Nametag solves this by giving you a single place to manage your personal network
 This guide covers self-hosting setup.
 
 ## Self-Hosting with Docker
+
+The official Docker images support both **AMD64** (x86_64) and **ARM64** (aarch64) architectures, making Nametag compatible with Apple Silicon Macs, Raspberry Pi, and ARM-based servers.
 
 ### Quick Start
 
