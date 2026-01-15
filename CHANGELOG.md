@@ -6,20 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [0.13.0](https://github.com/mattogodoy/nametag/compare/v0.12.3...v0.13.0) (2026-01-14)
+## [0.14.0](https://github.com/mattogodoy/nametag/compare/v0.13.0...v0.14.0) (2026-01-15)
 
 ### Features
 
-* Added option to disable registration ([eb5c9d2](https://github.com/mattogodoy/nametag/commit/eb5c9d223f60ffcba3f186453637b2526f088e1f))
+* add multi-platform Docker support (AMD64 and ARM64) ([3504ea4](https://github.com/mattogodoy/nametag/commit/3504ea4822e324f2ea3a6db3584a9fc22037c9c4))
 
 ### Changelog
 
 All notable changes to this project will be documented in this file. Dates are displayed in UTC.
 
+#### [v0.14.0](https://github.com/mattogodoy/nametag/compare/v0.13.0...v0.14.0)
+
+- 👷 CI: build multi-arch docker image [`#18`](https://github.com/mattogodoy/nametag/pull/18)
+- ✨ Feature: add multi-platform Docker support (AMD64 and ARM64) [`3504ea4`](https://github.com/mattogodoy/nametag/commit/3504ea4822e324f2ea3a6db3584a9fc22037c9c4)
+- 👷 CI: add manual workflow trigger [`2dccdef`](https://github.com/mattogodoy/nametag/commit/2dccdef83306fb9c1bf8da9a7daddcc05f239bfc)
+- 👷 CI: build to arm64 [`c47c8a7`](https://github.com/mattogodoy/nametag/commit/c47c8a7ef73d31f6c9291406b425084062db1e9a)
+
 #### [v0.13.0](https://github.com/mattogodoy/nametag/compare/v0.12.3...v0.13.0)
+
+> 14 January 2026
 
 - Add option to disable registration [`#17`](https://github.com/mattogodoy/nametag/pull/17)
 - ✨ Feature: Added option to disable registration [`eb5c9d2`](https://github.com/mattogodoy/nametag/commit/eb5c9d223f60ffcba3f186453637b2526f088e1f)
+- 🔧 Chore: release v0.13.0 [`87f6671`](https://github.com/mattogodoy/nametag/commit/87f6671f0f52fac014f51632f5064074d35ce87e)
 
 #### [v0.12.3](https://github.com/mattogodoy/nametag/compare/v0.12.2...v0.12.3)
 
