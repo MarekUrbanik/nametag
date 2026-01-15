@@ -59,28 +59,14 @@ services:
     # NPM can access directly using the proxy network
     #ports:
     #  - 3000:3000
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - NODE_ENV=production
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - RESEND_API_KEY=${RESEND_API_KEY}
-      - EMAIL_DOMAIN=${EMAIL_DOMAIN}
-      - CRON_SECRET=${CRON_SECRET}
-      - LOG_LEVEL=${LOG_LEVEL:-warn}
+      # Override URLs to use Docker service names instead of localhost
+      # (.env uses 'localhost' for local dev, Docker needs 'db' and 'redis')
+      - DATABASE_URL=${DATABASE_URL:-postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - SAAS_MODE=${SAAS_MODE:-false}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
-      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
-      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
-      - STRIPE_PRICE_PERSONAL_MONTHLY=${STRIPE_PRICE_PERSONAL_MONTHLY}
-      - STRIPE_PRICE_PERSONAL_YEARLY=${STRIPE_PRICE_PERSONAL_YEARLY}
-      - STRIPE_PRICE_PRO_MONTHLY=${STRIPE_PRICE_PRO_MONTHLY}
-      - STRIPE_PRICE_PRO_YEARLY=${STRIPE_PRICE_PRO_YEARLY}
+      - NODE_ENV=production
     depends_on:
       db:
         condition: service_healthy

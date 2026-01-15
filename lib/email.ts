@@ -1,28 +1,188 @@
 import { Resend } from "resend";
+import nodemailer from "nodemailer";
+import type { Transporter } from "nodemailer";
 import { env } from "./env";
 import { escapeHtml } from "./sanitize";
 import { getTranslationsForLocale, type SupportedLocale } from "./i18n-utils";
 import { getUserLocale } from "./locale";
 
-// Lazy initialization of Resend client
-let resendClient: Resend | null = null;
+// Email provider interfaces
+interface EmailSendResult {
+  success: boolean;
+  id?: string;
+  error?: string;
+  skipped?: boolean;
+  message?: string;
+}
 
-function getResendClient(): Resend | null {
-  if (!isEmailConfigured()) {
-    return null;
+interface EmailMessage {
+  from: string;
+  to: string | string[];
+  subject: string;
+  html: string;
+  text?: string;
+}
+
+interface EmailProvider {
+  send(message: EmailMessage): Promise<EmailSendResult>;
+  isConfigured(): boolean;
+}
+
+// SMTP Email Provider
+class SmtpEmailProvider implements EmailProvider {
+  private transporter: Transporter | null = null;
+
+  private getTransporter(): Transporter | null {
+    if (!this.isConfigured()) {
+      return null;
+    }
+
+    if (!this.transporter) {
+      this.transporter = nodemailer.createTransport({
+        host: env.SMTP_HOST,
+        port: env.SMTP_PORT,
+        secure: env.SMTP_SECURE,
+        auth: env.SMTP_USER && env.SMTP_PASS ? {
+          user: env.SMTP_USER,
+          pass: env.SMTP_PASS,
+        } : undefined,
+        requireTLS: env.SMTP_REQUIRE_TLS,
+        pool: true,
+        maxConnections: 5,
+        maxMessages: 100,
+        rateDelta: 1000,
+        rateLimit: 5,
+      });
+    }
+
+    return this.transporter;
   }
-  if (!resendClient) {
-    resendClient = new Resend(env.RESEND_API_KEY);
+
+  isConfigured(): boolean {
+    return !!(env.SMTP_HOST && env.SMTP_PORT && env.EMAIL_DOMAIN);
   }
-  return resendClient;
+
+  async send(message: EmailMessage): Promise<EmailSendResult> {
+    const transporter = this.getTransporter();
+    if (!transporter) {
+      return {
+        success: true,
+        skipped: true,
+        message: "SMTP not configured"
+      };
+    }
+
+    try {
+      // Use SMTP_FROM if configured, otherwise use the computed from address
+      const fromAddress = env.SMTP_FROM || message.from;
+
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: message.to,
+        subject: message.subject,
+        html: message.html,
+        text: message.text,
+      });
+
+      return {
+        success: true,
+        id: info.messageId
+      };
+    } catch (err) {
+      console.error("SMTP send error:", err);
+      const errorMessage = err instanceof Error ? err.message : "Failed to send email";
+      return {
+        success: false,
+        error: errorMessage
+      };
+    }
+  }
+}
+
+// Resend Email Provider
+class ResendEmailProvider implements EmailProvider {
+  private client: Resend | null = null;
+
+  private getClient(): Resend | null {
+    if (!this.isConfigured()) {
+      return null;
+    }
+
+    if (!this.client) {
+      this.client = new Resend(env.RESEND_API_KEY);
+    }
+
+    return this.client;
+  }
+
+  isConfigured(): boolean {
+    return !!(env.RESEND_API_KEY && env.EMAIL_DOMAIN);
+  }
+
+  async send(message: EmailMessage): Promise<EmailSendResult> {
+    const client = this.getClient();
+    if (!client) {
+      return {
+        success: true,
+        skipped: true,
+        message: "Resend not configured"
+      };
+    }
+
+    try {
+      const { data, error } = await client.emails.send({
+        from: message.from,
+        to: message.to,
+        subject: message.subject,
+        html: message.html,
+        text: message.text,
+      });
+
+      if (error) {
+        console.error("Failed to send email:", error);
+        return { success: false, error: error.message };
+      }
+
+      return { success: true, id: data?.id };
+    } catch (err) {
+      console.error("Email send error:", err);
+      return { success: false, error: "Failed to send email" };
+    }
+  }
+}
+
+// Lazy initialization of providers
+let smtpProvider: SmtpEmailProvider | null = null;
+let resendProvider: ResendEmailProvider | null = null;
+
+function getEmailProvider(): EmailProvider | null {
+  // Initialize providers lazily
+  if (!smtpProvider) {
+    smtpProvider = new SmtpEmailProvider();
+  }
+  if (!resendProvider) {
+    resendProvider = new ResendEmailProvider();
+  }
+
+  // Precedence: SMTP > Resend
+  if (smtpProvider.isConfigured()) {
+    return smtpProvider;
+  }
+
+  if (resendProvider.isConfigured()) {
+    return resendProvider;
+  }
+
+  return null;
 }
 
 /**
  * Check if email is properly configured
- * Returns true only if both RESEND_API_KEY and EMAIL_DOMAIN are set
+ * Returns true if either SMTP or Resend is configured
  */
 export function isEmailConfigured(): boolean {
-  return !!(env.RESEND_API_KEY && env.EMAIL_DOMAIN);
+  const provider = getEmailProvider();
+  return provider !== null && provider.isConfigured();
 }
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://nametag.one';
@@ -63,38 +223,23 @@ export type SendEmailOptions = {
   from?: keyof typeof fromAddresses;
 };
 
-export async function sendEmail({ to, subject, html, text, from = 'default' }: SendEmailOptions) {
-  // Check if email is configured
-  if (!isEmailConfigured()) {
+export async function sendEmail({ to, subject, html, text, from = 'default' }: SendEmailOptions): Promise<EmailSendResult> {
+  const provider = getEmailProvider();
+
+  if (!provider) {
     console.warn("Email not configured - skipping email send", { to, subject });
     return { success: true, skipped: true, message: "Email not configured" };
   }
 
-  const client = getResendClient();
-  if (!client) {
-    console.warn("Unable to get Resend client - skipping email send", { to, subject });
-    return { success: true, skipped: true, message: "Email client not available" };
-  }
+  const message: EmailMessage = {
+    from: fromAddresses[from],
+    to,
+    subject,
+    html,
+    text,
+  };
 
-  try {
-    const { data, error } = await client.emails.send({
-      from: fromAddresses[from],
-      to,
-      subject,
-      html,
-      text,
-    });
-
-    if (error) {
-      console.error("Failed to send email:", error);
-      return { success: false, error: error.message };
-    }
-
-    return { success: true, id: data?.id };
-  } catch (err) {
-    console.error("Email send error:", err);
-    return { success: false, error: "Failed to send email" };
-  }
+  return provider.send(message);
 }
 
 /**

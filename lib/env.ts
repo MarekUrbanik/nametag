@@ -19,6 +19,15 @@ const envSchema = z.object({
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required').optional(),
   EMAIL_DOMAIN: z.string().min(1, 'EMAIL_DOMAIN is required').optional(),
 
+  // Email (SMTP) - Optional alternative to Resend
+  SMTP_HOST: z.string().min(1).optional(),
+  SMTP_PORT: z.coerce.number().min(1).max(65535).optional(),
+  SMTP_SECURE: z.coerce.boolean().default(false).optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_REQUIRE_TLS: z.coerce.boolean().default(true).optional(),
+  SMTP_FROM: z.string().optional(), // Override from address (e.g., for servers that reject custom from addresses)
+
   // Google OAuth - Only required in SaaS mode
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
@@ -70,7 +79,13 @@ function validateEnv(): Env {
   if (result.data.SAAS_MODE) {
     const missing = [];
 
-    if (!result.data.RESEND_API_KEY) missing.push('RESEND_API_KEY');
+    // Require either Resend OR SMTP for email
+    const hasResend = !!result.data.RESEND_API_KEY;
+    const hasSmtp = !!(result.data.SMTP_HOST && result.data.SMTP_PORT);
+    if (!hasResend && !hasSmtp) {
+      missing.push('RESEND_API_KEY or SMTP_HOST+SMTP_PORT');
+    }
+
     if (!result.data.EMAIL_DOMAIN) missing.push('EMAIL_DOMAIN');
     if (!result.data.GOOGLE_CLIENT_ID) missing.push('GOOGLE_CLIENT_ID');
     if (!result.data.GOOGLE_CLIENT_SECRET) missing.push('GOOGLE_CLIENT_SECRET');
@@ -81,6 +96,34 @@ function validateEnv(): Env {
       console.error('\nPlease check your .env file.\n');
       throw new Error('Invalid environment configuration');
     }
+  }
+
+  // Validate SMTP configuration - if any SMTP var is set, host and port are required
+  const smtpVars = [
+    result.data.SMTP_HOST,
+    result.data.SMTP_PORT,
+    result.data.SMTP_USER,
+    result.data.SMTP_PASS,
+  ];
+  const hasAnySmtpConfig = smtpVars.some(v => v !== undefined);
+
+  if (hasAnySmtpConfig && (!result.data.SMTP_HOST || !result.data.SMTP_PORT)) {
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error('  - If any SMTP_* variable is set, both SMTP_HOST and SMTP_PORT are required');
+    console.error('\nPlease check your .env file.\n');
+    throw new Error('Invalid environment configuration');
+  }
+
+  // Validate that EMAIL_DOMAIN is set if either email provider is configured
+  const hasEmailProvider =
+    (result.data.RESEND_API_KEY) ||
+    (result.data.SMTP_HOST && result.data.SMTP_PORT);
+
+  if (hasEmailProvider && !result.data.EMAIL_DOMAIN) {
+    console.error('\n❌ Invalid environment variables:\n');
+    console.error('  - EMAIL_DOMAIN is required when email is configured (Resend or SMTP)');
+    console.error('\nPlease check your .env file.\n');
+    throw new Error('Invalid environment configuration');
   }
 
   return result.data;

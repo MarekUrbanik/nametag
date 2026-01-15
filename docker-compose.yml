@@ -44,22 +44,13 @@ services:
     restart: unless-stopped
     ports:
       - 3000:3000
+    env_file:
+      - .env
     environment:
+      # Override URLs to use Docker service names instead of localhost
+      # (.env uses 'localhost' for local dev, Docker needs 'db' and 'redis')
       - DATABASE_URL=${DATABASE_URL:-postgresql://${DB_USER:-nametag}:${DB_PASSWORD}@db:5432/${DB_NAME:-nametag_db}}
-      - NODE_ENV=${NODE_ENV:-development}
-      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?NextAuth secret required}
-      - RESEND_API_KEY=${RESEND_API_KEY:?Resend API key required}
-      - EMAIL_DOMAIN=${EMAIL_DOMAIN:?Email domain required}
-      - CRON_SECRET=${CRON_SECRET:?Cron secret required}
-      - LOG_LEVEL=${LOG_LEVEL:-info}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD:?Redis password required}
-      - SAAS_MODE=${SAAS_MODE:-false}
-      - DISABLE_REGISTRATION=${DISABLE_REGISTRATION:-false}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     volumes:
       # Mount source code for hot-reload
       - .:/app

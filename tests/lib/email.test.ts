@@ -1,10 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock the env module before importing email
+// Test with Resend configured (SMTP not configured)
 vi.mock('../../lib/env', () => ({
   env: {
     RESEND_API_KEY: 'test-resend-api-key',
     EMAIL_DOMAIN: 'test.example.com',
+    SMTP_HOST: undefined,
+    SMTP_PORT: undefined,
   },
 }));
 
@@ -19,6 +22,15 @@ vi.mock('resend', () => {
     },
   };
 });
+
+// Mock nodemailer (not used in this test but needs to be mocked)
+vi.mock('nodemailer', () => ({
+  default: {
+    createTransport: vi.fn(() => ({
+      sendMail: vi.fn(),
+    })),
+  },
+}));
 
 describe('email', () => {
   beforeEach(() => {

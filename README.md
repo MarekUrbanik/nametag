@@ -108,14 +108,11 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql://nametag:${DB_PASSWORD}@db:5432/nametag_db
-      - NEXTAUTH_URL=${NEXTAUTH_URL}
-      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
-      - CRON_SECRET=${CRON_SECRET}
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
     depends_on:
       - db
       - redis
@@ -160,9 +157,22 @@ CRON_SECRET=your-cron-secret-minimum-16-characters
 
 # Email (OPTIONAL - only needed for password resets and reminders)
 # Self-hosted instances work without email - new accounts are auto-verified
+
+# Option 1: Resend (recommended for simplicity)
 # Sign up at https://resend.com if you want email functionality
 #RESEND_API_KEY=re_your_api_key
 #EMAIL_DOMAIN=yourdomain.com
+
+# Option 2: SMTP (use your own email server)
+# If both are configured, SMTP takes precedence over Resend
+# Note: Gmail/Outlook will rewrite the "from" address to your authenticated email
+#SMTP_HOST=smtp.gmail.com
+#SMTP_PORT=587
+#SMTP_SECURE=false
+#SMTP_REQUIRE_TLS=true
+#SMTP_USER=your-email@gmail.com
+#SMTP_PASS=your-app-password
+#EMAIL_DOMAIN=gmail.com
 ```
 
 4. Start the services:
@@ -193,7 +203,14 @@ The database will be automatically set up on first run.
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `RESEND_API_KEY` | API key from [Resend](https://resend.com) for email functionality | Not required for self-hosted |
-| `EMAIL_DOMAIN` | Verified domain for sending emails | Not required for self-hosted |
+| `EMAIL_DOMAIN` | Verified domain for sending emails (required if using Resend or SMTP) | Not required for self-hosted |
+| `SMTP_HOST` | SMTP server hostname (alternative to Resend) | Not set |
+| `SMTP_PORT` | SMTP server port (587 for STARTTLS, 465 for SSL) | Not set |
+| `SMTP_SECURE` | Use SSL/TLS (true for port 465, false for 587) | `false` |
+| `SMTP_USER` | SMTP username (often your email address) | Not set |
+| `SMTP_PASS` | SMTP password or app-specific password | Not set |
+| `SMTP_REQUIRE_TLS` | Require STARTTLS for security | `true` |
+| `SMTP_FROM` | Override "from" address (use if server rejects custom addresses) | Not set |
 | `DISABLE_REGISTRATION` | Disable user registration after first user | `false` |
 | `NODE_ENV` | Environment mode | `production` |
 | `LOG_LEVEL` | Logging verbosity | `info` |
@@ -203,14 +220,65 @@ The database will be automatically set up on first run.
 Email configuration is **optional for self-hosted instances**. Nametag works perfectly without it:
 
 - **Without email**: New accounts are automatically verified and users can log in immediately. Password resets and contact reminders are unavailable.
-- **With email**: Enables password reset functionality and contact reminder emails via [Resend](https://resend.com).
+- **With email**: Enables password reset functionality and contact reminder emails.
 
-If you want email functionality:
+Nametag supports two email providers:
+
+#### Option 1: Resend (Recommended for Simplicity)
 
 1. Sign up for a free Resend account at [resend.com](https://resend.com)
 2. Add and verify your domain
 3. Create an API key
-4. Add `RESEND_API_KEY` and `EMAIL_DOMAIN` to your `.env` file
+4. Add to your `.env` file:
+   ```bash
+   RESEND_API_KEY=re_your_api_key
+   EMAIL_DOMAIN=yourdomain.com
+   ```
+
+#### Option 2: SMTP (Use Your Own Email Server)
+
+Use any SMTP server (Gmail, Outlook, your own mail server, etc.):
+
+1. Get your SMTP credentials from your email provider
+2. Add to your `.env` file:
+   ```bash
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_REQUIRE_TLS=true
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-password
+   SMTP_FROM=your-email@gmail.com
+   EMAIL_DOMAIN=gmail.com
+   ```
+
+**Important Notes about "From" Addresses:**
+
+Most SMTP servers restrict which addresses you can send from:
+
+1. **If your SMTP server rejects custom addresses** (error like "Sender address rejected: not owned by user"):
+   - Add `SMTP_FROM=your-email@example.com` to your `.env`
+   - All emails will use your authenticated address instead of `accounts@`, `reminders@`, etc.
+   - Example for matto.io: `SMTP_FROM=matto@matto.io`
+
+2. **For Gmail/Outlook without custom domain**:
+   - These providers automatically rewrite to your authenticated email
+   - Set `EMAIL_DOMAIN=gmail.com` or `EMAIL_DOMAIN=outlook.com`
+   - Display names are preserved, but address becomes `your-email@gmail.com`
+
+3. **For custom domains** (e.g., Google Workspace, custom mail server):
+   - If properly configured, you can use `accounts@yourdomain.com`, etc.
+   - Set `EMAIL_DOMAIN=yourdomain.com` and don't set `SMTP_FROM`
+
+**Common SMTP Providers:**
+- **Gmail**: `smtp.gmail.com:587` (requires [app password](https://support.google.com/accounts/answer/185833))
+- **Outlook**: `smtp-mail.outlook.com:587`
+- **SendGrid**: `smtp.sendgrid.net:587`
+- **Mailgun**: `smtp.mailgun.org:587`
+
+**Provider Precedence**: If both Resend and SMTP are configured, SMTP takes precedence.
+
+**Rate Limiting**: SMTP is configured with connection pooling (max 5 concurrent connections) and rate limiting (5 messages/second). If the rate limit is exceeded, emails are automatically queued and sent with a delay. Note that the queue is in-memory only - if the application restarts, queued messages are lost.
 
 **Note**: The hosted service at [nametag.one](https://nametag.one) requires email verification for security, but self-hosted instances are designed for personal use and auto-verify all accounts.
 
@@ -264,7 +332,7 @@ server {
 - **Styling**: Tailwind CSS
 - **Graphs**: D3.js for network visualization
 - **Auth**: NextAuth.js
-- **Email**: Resend
+- **Email**: Resend or SMTP (nodemailer)
 
 ## Contributing
 
