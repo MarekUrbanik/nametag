@@ -43,9 +43,7 @@ services:
     container_name: nametag-app
     restart: unless-stopped
     ports:
-      - 3000:3000
-    env_file:
-      - .env
+      - 9012:3000
     environment:
       # Override URLs to use Docker service names instead of localhost
       # (.env uses 'localhost' for local dev, Docker needs 'db' and 'redis')
@@ -92,5 +90,4 @@ volumes:
 
 networks:
   nametag-network:
-    external: true
     name: nametag-network
